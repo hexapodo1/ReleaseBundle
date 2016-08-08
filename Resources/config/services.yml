@@ -1,0 +1,4 @@
+services:
+#    release.example:
+#        class: Kishron\ReleaseBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]

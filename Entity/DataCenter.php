@@ -1,0 +1,108 @@
+<?php
+
+namespace Kishron\ReleaseBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * DataCenter
+ *
+ * @ORM\Table(name="data_center")
+ * @ORM\Entity(repositoryClass="Kishron\ReleaseBundle\Repository\DataCenterRepository")
+ */
+class DataCenter
+{
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="Revision", mappedBy="dataCenter")
+     */
+    private $revisions;
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return DataCenter
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string 
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->revisions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add revisions
+     *
+     * @param \Kishron\ReleaseBundle\Entity\Revision $revisions
+     * @return DataCenter
+     */
+    public function addRevision(\Kishron\ReleaseBundle\Entity\Revision $revisions)
+    {
+        $this->revisions[] = $revisions;
+
+        return $this;
+    }
+
+    /**
+     * Remove revisions
+     *
+     * @param \Kishron\ReleaseBundle\Entity\Revision $revisions
+     */
+    public function removeRevision(\Kishron\ReleaseBundle\Entity\Revision $revisions)
+    {
+        $this->revisions->removeElement($revisions);
+    }
+
+    /**
+     * Get revisions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getRevisions()
+    {
+        return $this->revisions;
+    }
+}
