@@ -161,5 +161,32 @@ class DefaultController extends Controller
         return new JsonResponse($storyCount);
     }
     
-    
+    /**
+     * @Route("/summary", name="summary")
+     */
+    public function summaryAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        
+        // repos
+        $storyRepo = $em->getRepository("ReleaseBundle:Story");
+        $releaseRepo = $em->getRepository("ReleaseBundle:ReleaseObj");
+        $dataCenterRepo = $em->getRepository("ReleaseBundle:DataCenter");
+        
+        $release = $releaseRepo->findOneBy(array(
+            'active' => true
+        ));
+        
+        $stories = $storyRepo->findBy(array(
+            'release' => $release
+        ));
+        
+        $dataCenters = $dataCenterRepo->findAll();
+        
+        return $this->render('ReleaseBundle:Default:summary.html.twig', array(
+            'release' => $release,
+            'stories' => $stories,
+            'dataCenters' => $dataCenters
+        ));
+    }
 }

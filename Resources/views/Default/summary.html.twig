@@ -1,0 +1,24 @@
+    <h3>{{ release }}</h3>
+    <table class="table table-bordered table-striped" >
+        <tr>
+            <th rowspan="2" valign="bottom"></th>
+        </tr>
+        <tr>
+            {% for dataCenter in dataCenters%}
+                <th>{{ dataCenter.name }}</th>
+            {% endfor %}
+        </tr>
+        {% for story in stories %}
+        <tr>
+            <td>
+                <strong>{{ story.code }}</strong> - {{ story.name }}
+            </td>
+            {% for dataCenter in dataCenters%}
+            <td>
+                {{story.reviews(dataCenter.id)}}
+            </td>
+            {% endfor %}
+            
+        </tr>
+        {% endfor %}
+    </table>

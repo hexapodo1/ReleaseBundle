@@ -1,6 +1,13 @@
 {% extends 'ReleaseBundle:Default:base.html.twig' %}
 {% block content %}
-    {% set userId=1 %}
+{% set userId=1 %}
+<div id="modal" title="Summary" style="display: none;">
+    <div id="modal-content"></div>
+    <br>
+    <button class="btn btn-info center-block" id="btn-publicar">	
+        Publish
+    </button>
+</div>
 <div id="tabs">
     <ul>
         {% for dataCenter in dataCenters %}
@@ -66,10 +73,75 @@
     </div>
     {% endfor %}
 </div>
+<br>
+<button class="btn btn-info" id="btn-summary">Summary</button>    
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function(){
+        $('#btn-summary').click(function(e) {
+            e.preventDefault();
+            $('#modal').dialog({
+                modal: true,
+                width: 700,
+                height: 500,
+                position: {
+                    my: "top",
+                    at: "top+50",
+                    of: document
+                },
+            });
+            $.ajax({
+                url: "{{ path('summary') }}",
+                method: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $('#modal-content').html(data);
+                }
+            });
+        });
+        
+        $('#btn-publicar').click(function(e) {
+            e.preventDefault();
+            
+            var card = {
+                "style": "link",
+                "url": "http://i0.kym-cdn.com/photos/images/newsfeed/000/131/786/tumblr_ljkeuyjp1a1qafrh6.gif",
+                "id": "fee4d9a3-685d-4cbd-abaa-c8850d9b1960",
+                "title": "My test",
+                "description": {
+                    "format": "html",
+                    "value": "<b>Add-on link:</b> <a href='#' data-target='hip-connect-tester:hctester.dialog.simple' data-target-options='{\"options\":{\"title\":\"Custom Title\"}, \"parameters\":{\"from\":\"link\"}}'>Open Dialog with parameters</a>"
+                },
+                "icon": {
+                    "url": "http://icons.iconarchive.com/icons/designbolts/hand-stitched/24/RSS-icon.png"
+                },
+                "date": 1443057955792
+            }
+            
+            $.ajax({
+                url: "{{ path('summary') }}",
+                method: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $.ajax({
+                        url: "https://kishron.hipchat.com/v2/room/2789987/notification?auth_token=kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je",
+                        method: "POST",
+                        data: {
+                            "color": "green",
+                            "message": data,
+                            "card": card,
+                            "notify": false,
+                            "message_format": "html"
+                        },
+                        dataType: "json",
+                    });
+                }
+            });
+            
+                
+        });
+        
         setInterval(function(){
             $.ajax({
                 url: "{{ path('statusStories') }}",
