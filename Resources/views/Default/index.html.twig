@@ -1,1 +1,139 @@
-Hello World!
+{% extends 'ReleaseBundle:Default:base.html.twig' %}
+{% block content %}
+    {% set userId=1 %}
+<div id="tabs">
+    <ul>
+        {% for dataCenter in dataCenters %}
+        <li><a href="#tabs-{{ dataCenter.id }}">{{ dataCenter.name }}</a></li>
+        {% endfor %}
+        
+    </ul>
+    {% for dataCenter in dataCenters %}
+    <div id="tabs-{{ dataCenter.id }}">
+        <h3>{{ release }}</h3>
+        <h4>{{ dataCenter.name }}</h4>
+        <table class="table table-hover table-bordered table-striped" style="background-color: white">
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>#</th>
+                <th class="options">Revision</th>
+            </tr>
+            {% for story in stories %}
+            <tr>
+                <td>{{ story.code }}</td>
+                <td><a href="{{ story.rallyUrl }}">{{ story.name }}</a></td>
+                <td><span class="review" id="review_{{ dataCenter.id }}_{{story.id}}">
+                        {{ story.getReviews(dataCenter.id) }}
+                    </span></td>
+                <td>
+                    <button 
+                        id="btn-leave"
+                        class="btn btn-danger btn-action" 
+                        data-story-id="{{ story.id }}" 
+                        data-user-id="{{ userId }}" 
+                        data-data-center-id="{{ dataCenter.id }}"
+                        data-action="leave"
+                        {% if not story.reviewedByMe(dataCenter.id, userId) %}
+                            style="display: none;"
+                        {% endif %}
+                    >
+                        Leave
+                    </button>
+                    <button 
+                        id="btn-reviewed"
+                        class="btn btn-success btn-action"
+                        data-story-id="{{ story.id }}" 
+                        data-user-id="{{ userId }}" 
+                        data-data-center-id="{{ dataCenter.id }}"
+                        data-action="reviewed"
+                        {% if story.reviewedByMe(dataCenter.id, userId) %}
+                            style="display: none;"
+                        {% endif %}
+                    >
+                        Reviewed
+                    </button>
+                    {% if story.reviewedByMe(dataCenter.id, userId) %}
+                        
+                    {% else %}
+                        
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        setInterval(function(){
+            $.ajax({
+                url: "{{ path('statusStories') }}",
+                method: "POST",
+                dataType: "json",
+                success: function (data) {
+                    $('.review').html('0');
+                    for(var propt in data){
+                        //console.log(propt + ': ');
+                        var obj = data[propt];
+                        for (var propt2 in obj) {
+                            // using jquery selectors causes error (a jquery bug)
+                            var span = document.getElementById('review_' + propt + '_' + propt2);
+                            span.innerHTML = data[propt][propt2];
+                        }
+                    }
+                }
+            });
+        }, 1000);
+        $( "#tabs" ).tabs();
+        $('.btn-action').click(function(e){
+            e.preventDefault();
+            var button = $(this);
+            var payLoad = new Object();
+            payLoad.storyId = $(this).data('story-id');
+            payLoad.userId = $(this).data('user-id');
+            payLoad.dataCenterId = $(this).data('data-center-id');
+            payLoad.action = $(this).data('action');
+            $.ajax({
+                url: "{{ path('process') }}",
+                method: "POST",
+                data: payLoad,
+                dataType: "json",
+                success: function (data) {
+                    $.ajax({
+                        url: "{{ path('reviews') }}",
+                        method: "POST",
+                        data: payLoad,
+                        dataType: "json",
+                        success: function (data) {
+                            button.parent().parent().find('.review').html(data.n);
+                            $.ajax({
+                                url: "https://kishron.hipchat.com/v2/room/2789987/notification?auth_token=kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je",
+                                method: "POST",
+                                data: {
+                                    "color": "red",
+                                    "message": data.message,
+                                    "notify": false,
+                                    "message_format": "text"
+                                },
+                                dataType: "json",
+                                success: function (data) {
+                                    console.log(data);
+                                }
+                            });
+                        }
+                    });
+                    button.hide();
+                    button.prev().show();
+                    button.next().show();
+                }
+            });
+            
+        });
+    });
+</script>
+{% endblock %}

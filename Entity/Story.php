@@ -194,4 +194,25 @@ class Story
     {
         return $this->revisions;
     }
+    
+    public function getReviews($dataCenterId) {
+        $i = 0;
+        foreach($this->getRevisions() as $revision) {
+            if ($revision->getDataCenter()->getId() == $dataCenterId ) {
+                $i++;
+            }
+        }
+        return $i;
+    }
+    
+    public function reviewedByMe($dataCenterId, $userId) {
+        $reviewed = false;
+        foreach($this->getRevisions() as $revision) {
+            if ($revision->getDataCenter()->getId() == $dataCenterId &&
+                $revision->getUser()->getId() == $userId     ) {
+                $reviewed = $reviewed || true;
+            }
+        }
+        return $reviewed;
+    }
 }

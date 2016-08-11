@@ -12,4 +12,18 @@ use Doctrine\ORM\EntityRepository;
  */
 class RevisionRepository extends EntityRepository
 {
+    public function getRevisionsByRelease($releaseId) {
+        $em = $this->getEntityManager();
+        $query = $em->getRepository('ReleaseBundle:Revision')
+                ->createQueryBuilder('r')
+                ->select('r')
+                ->innerJoin('r.story', 's')
+                ->innerJoin('r.dataCenter', 'dc')
+                ->innerJoin('s.release', 'release')
+                ->where('release = :releaseId')
+                ->setParameter('releaseId', $releaseId)
+                ->getQuery();
+        $products = $query->getResult();
+        return $products;
+    }
 }

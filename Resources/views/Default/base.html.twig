@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}App Config System{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="{{ asset('bundles/release/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/release/jquery-ui-1.11.4/jquery-ui.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/release/jstree/themes/default/style.min.css') }}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        body {
+            padding: 10px;   
+        }
+        .panel-tree {
+            border: #bbbbbb 1px solid;
+            border-radius: 5px;
+            box-shadow:  5px 5px 15px 1px rgba(80,120,120, 0.1);
+            padding: 10px;
+            height: 90vh;
+            overflow: auto;
+            text-align: justify;
+        }
+        #panel-main {
+            border: #bbbbbb 1px solid;
+            border-radius: 5px;
+            box-shadow:  5px 5px 15px 1px rgba(80,120,120, 0.1);
+        }
+        .panel-main {
+            padding: 10px;
+            overflow: auto;
+            text-align: justify;
+        }
+        .panel-main-content {
+            height: 90vh;
+            padding-top: 20px;
+        }
+        
+        .footer {
+            position: fixed;
+            height: 8vh;
+            bottom: -1em;
+            width: 100%;
+            border-top: #0000F0 1px solid;
+        }
+        
+        .options {
+            width: 9em;
+        }
+ 
+
+    </style>
+  </head>
+    <body>
+        <div class="container">
+            
+            <!-- main panel (header & content) -->
+            <div id="panel-main">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="panel-main panel-main-content" id="panel-main-content">
+                            
+                            {% block content %}
+                            {% endblock %}
+
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- footer -->
+        <div class="footer">
+            <div class="col-xs-12 text-center">
+                jaja
+            </div>
+        </div>
+
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      <script src="{{ asset('bundles/release/jquery/jquery-2.2.4.min.js') }}"></script>
+      <script src="{{ asset('bundles/release/bootstrap/js/bootstrap.min.js') }}"></script>
+      <script src="{{ asset('bundles/release/jquery-ui-1.11.4/jquery-ui.min.js') }}"></script>
+      <script src="{{ asset('bundles/release/jstree/jstree.min.js') }}"></script>
+      <!-- Include all compiled plugins (below), or include individual files as needed -->
+      {% block js %}
+            
+      {% endblock %}
+    </body>
+</html>
