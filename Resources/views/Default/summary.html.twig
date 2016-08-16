@@ -1,5 +1,14 @@
-    <h3>{{ release }}</h3>
-    <table class="table table-bordered table-striped" >
+    <table border="1" class="table table-bordered table-striped" >
+        <tr>
+            <th colspan="{{ dataCenters | length + 1 }}" valign="bottom">
+                Summary: {{ release }}
+            </th>
+        </tr>
+        <tr>
+            <th colspan="{{ dataCenters | length + 1 }}" valign="bottom">
+                &nbsp;
+            </th>
+        </tr>
         <tr>
             <th rowspan="2" valign="bottom"></th>
         </tr>

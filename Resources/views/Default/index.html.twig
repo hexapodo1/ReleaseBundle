@@ -1,6 +1,6 @@
 {% extends 'ReleaseBundle:Default:base.html.twig' %}
 {% block content %}
-{% set userId=1 %}
+{% set userId = app.user.id %}
 <div id="modal" title="Summary" style="display: none;">
     <div id="modal-content"></div>
     <br>
@@ -79,9 +79,10 @@
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function(){
+        var modal;
         $('#btn-summary').click(function(e) {
             e.preventDefault();
-            $('#modal').dialog({
+            modal = $('#modal').dialog({
                 modal: true,
                 width: 700,
                 height: 500,
@@ -103,8 +104,9 @@
         
         $('#btn-publicar').click(function(e) {
             e.preventDefault();
+            modal.dialog("close");
             
-            var card = {
+            {#var card = {
                 "style": "link",
                 "url": "http://i0.kym-cdn.com/photos/images/newsfeed/000/131/786/tumblr_ljkeuyjp1a1qafrh6.gif",
                 "id": "fee4d9a3-685d-4cbd-abaa-c8850d9b1960",
@@ -117,7 +119,7 @@
                     "url": "http://icons.iconarchive.com/icons/designbolts/hand-stitched/24/RSS-icon.png"
                 },
                 "date": 1443057955792
-            }
+            }#}
             
             $.ajax({
                 url: "{{ path('summary') }}",
@@ -125,12 +127,12 @@
                 dataType: "html",
                 success: function (data) {
                     $.ajax({
-                        url: "https://kishron.hipchat.com/v2/room/2789987/notification?auth_token=kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je",
+                        url: "https://kishron.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
                         method: "POST",
                         data: {
                             "color": "green",
                             "message": data,
-                            "card": card,
+                            //"card": card,
                             "notify": false,
                             "message_format": "html"
                         },
@@ -160,7 +162,7 @@
                     }
                 }
             });
-        }, 1000);
+        }, {{ releaseApp.refresh * 1000 }} );
         $( "#tabs" ).tabs();
         $('.btn-action').click(function(e){
             e.preventDefault();
@@ -184,7 +186,7 @@
                         success: function (data) {
                             button.parent().parent().find('.review').html(data.n);
                             $.ajax({
-                                url: "https://kishron.hipchat.com/v2/room/2789987/notification?auth_token=kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je",
+                                url: "https://kishron.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
                                 method: "POST",
                                 data: {
                                     "color": "red",

@@ -97,7 +97,7 @@ class DefaultController extends Controller
     public function reviewsAction(Request $request) {
         
         $em = $this->getDoctrine()->getManager();
-        $userId = 1;
+        $userId = $this->getUser()->getId();
         
         $dataCenterId = $request->request->get('dataCenterId');
         $storyId = $request->request->get('storyId');
@@ -188,5 +188,20 @@ class DefaultController extends Controller
             'stories' => $stories,
             'dataCenters' => $dataCenters
         ));
+    }
+    
+    /**
+     * @Route("/user", name="user")
+     */
+    public function userAction() {
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository('ReleaseBundle:User');
+        $entity = $repo->find(2);
+        $entity->setSalt(md5(time()));
+        $encoder = $this->container->get('security.encoder_factory')->getEncoder($entity);
+        $passwordCodificado = $encoder->encodePassword('123456', $entity->getSalt());
+        $entity->setPassword($passwordCodificado);    
+        $em->persist($entity);
+        $em->flush();
     }
 }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}Log In - UI releases - Alert Logic{% endblock %}</title>
+
+    {% block stylesheets %}
+        
+        <!-- Bootstrap Core CSS -->
+        <link href="{{ asset('bundles/release/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+        <style type="text/css">
+            div.ui-dialog {position:fixed;} 
+        </style>
+    {% endblock %}
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Shortcut Icon -->
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}" />
+</head>
+
+<body id="page-top" class="index">
+    {% block body %}
+        <div class="container">
+            <h1 class="text-center">UI releases - Alert Logic</h1>
+            <div id="wrapper-login-form" class="col-sm-4 col-sm-offset-4">
+                {% if last_user %}
+                    <div class="alert alert-danger" role="alert">
+                        Verify your credentials and try again, please.
+                    </div>
+                {% endif %}
+                <div class="login-form">
+                    <form id="form-login" action="{{ path("login_check") }}" method="post">
+                        <br>
+                        <div class="form-group">
+                            <label>User</label>
+                            <input type="text" class="form-control" id="loginEmail" name="_username" 
+                                   value="{{ last_user }}" placeholder="Your username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" id="loginPass" name="_password" placeholder="Your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary center-block">Log In</button>
+                        <br>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+    
+    {% block javascripts %}
+        <script src="{{ asset('bundles/release/jquery/jquery-2.2.4.min.js') }}"></script>
+        <!-- Bootstrap Core JavaScript -->
+        <script src="{{ asset('bundles/release/bootstrap/js/bootstrap.min.js') }}"></script>
+    
+        <!-- jQuery -->
+        <link rel="stylesheet" href="{{ asset('bundles/release/jquery-ui-1.11.4/jquery-ui.min.css') }}">
+
+        <script src="{{ asset('bundles/release/jquery-ui-1.11.4/jquery-ui.min.js') }}"></script>
+
+
+        <script>
+            $(document).ready(function(){
+                $('#loginEmail').focus();
+            });
+        </script>
+    {% endblock %}
+</body>
+
+</html>

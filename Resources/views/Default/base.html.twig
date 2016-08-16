@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}App Config System{% endblock %}</title>
+    <title>{% block title %}UI releases - Alert Logic{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link href="{{ asset('bundles/release/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -41,16 +41,15 @@
             text-align: justify;
         }
         .panel-main-content {
-            height: 90vh;
+            height: 88vh;
             padding-top: 20px;
         }
         
         .footer {
             position: fixed;
             height: 8vh;
-            bottom: -1em;
+            bottom: -1.1em;
             width: 100%;
-            border-top: #0000F0 1px solid;
         }
         
         .options {
@@ -65,6 +64,11 @@
             
             <!-- main panel (header & content) -->
             <div id="panel-main">
+                <div class="row">
+                    <div class="col-xs-12 text-muted text-right">
+                        {{ app.user.name }} (<a href="logout">Log Out</a>)
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="panel-main panel-main-content" id="panel-main-content">
@@ -84,7 +88,7 @@
         <!-- footer -->
         <div class="footer">
             <div class="col-xs-12 text-center">
-                jaja
+                footer
             </div>
         </div>
 
