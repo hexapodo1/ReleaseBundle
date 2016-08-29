@@ -30,7 +30,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:index.html.twig', array(
             'release' => $release,
@@ -118,12 +120,13 @@ class DefaultController extends Controller
         }
         
         if ($success) { 
-            $state = "(successful)";
+            $state = "(success)";
         } else {
             $state = "(facepalm) Sorry.";
         }
 
         $return = array(
+            'success' => $success,
             'n' => count($revisions),
             'message' => $user->getName() 
                 . ': ' . $story->getCode() . ' - '
@@ -181,7 +184,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:summary.html.twig', array(
             'release' => $release,
@@ -196,7 +201,7 @@ class DefaultController extends Controller
     public function userAction() {
         $em = $this->getDoctrine()->getManager();
         $repo = $em->getRepository('ReleaseBundle:User');
-        $entity = $repo->find(2);
+        $entity = $repo->find(1);
         $entity->setSalt(md5(time()));
         $encoder = $this->container->get('security.encoder_factory')->getEncoder($entity);
         $passwordCodificado = $encoder->encodePassword('123456', $entity->getSalt());
