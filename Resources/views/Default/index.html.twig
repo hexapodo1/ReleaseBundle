@@ -29,7 +29,7 @@
             {% for story in stories %}
             <tr>
                 <td>{{ story.code }}</td>
-                <td><a href="{{ story.rallyUrl }}">{{ story.name }}</a></td>
+                <td><a href="{{ story.rallyUrl }}" target="_blank">{{ story.name }}</a></td>
                 <td><span class="review" id="review_{{ dataCenter.id }}_{{story.id}}">
                         {{ story.getReviews(dataCenter.id) }}
                     </span></td>
@@ -127,7 +127,7 @@
                 dataType: "html",
                 success: function (data) {
                     $.ajax({
-                        url: "https://kishron.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
+                        url: "https://alertlogic.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
                         method: "POST",
                         data: {
                             "color": "green",
@@ -167,6 +167,7 @@
         $('.btn-action').click(function(e){
             e.preventDefault();
             var button = $(this);
+            button.hide();
             var payLoad = new Object();
             payLoad.storyId = $(this).data('story-id');
             payLoad.userId = $(this).data('user-id');
@@ -178,18 +179,26 @@
                 data: payLoad,
                 dataType: "json",
                 success: function (data) {
+                    button.prev().show();
+                    button.next().show();
                     $.ajax({
                         url: "{{ path('reviews') }}",
                         method: "POST",
                         data: payLoad,
                         dataType: "json",
                         success: function (data) {
+                            var color;
+                            if (data.success) {
+                                color = 'green';
+                            } else {
+                                color = 'red';
+                            }
                             button.parent().parent().find('.review').html(data.n);
                             $.ajax({
-                                url: "https://kishron.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
+                                url: "https://alertlogic.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
                                 method: "POST",
                                 data: {
-                                    "color": "red",
+                                    "color": color,
                                     "message": data.message,
                                     "notify": false,
                                     "message_format": "text"
@@ -201,9 +210,6 @@
                             });
                         }
                     });
-                    button.hide();
-                    button.prev().show();
-                    button.next().show();
                 }
             });
             

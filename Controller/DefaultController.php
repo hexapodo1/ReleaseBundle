@@ -124,6 +124,7 @@ class DefaultController extends Controller
         }
 
         $return = array(
+            'success' => $success,
             'n' => count($revisions),
             'message' => $user->getName() 
                 . ': ' . $story->getCode() . ' - '
@@ -196,7 +197,7 @@ class DefaultController extends Controller
     public function userAction() {
         $em = $this->getDoctrine()->getManager();
         $repo = $em->getRepository('ReleaseBundle:User');
-        $entity = $repo->find(2);
+        $entity = $repo->find(1);
         $entity->setSalt(md5(time()));
         $encoder = $this->container->get('security.encoder_factory')->getEncoder($entity);
         $passwordCodificado = $encoder->encodePassword('123456', $entity->getSalt());
