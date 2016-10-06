@@ -50,7 +50,7 @@ class StoryController extends Controller
             $em->persist($story);
             $em->flush();
 
-            return $this->redirectToRoute('story_show', array('id' => $story->getId()));
+            return $this->redirectToRoute('story_index');
         }
 
         return $this->render('story/new.html.twig', array(

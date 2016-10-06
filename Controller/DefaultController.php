@@ -30,7 +30,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:index.html.twig', array(
             'release' => $release,
@@ -118,7 +120,7 @@ class DefaultController extends Controller
         }
         
         if ($success) { 
-            $state = "(successful)";
+            $state = "(success)";
         } else {
             $state = "(facepalm) Sorry.";
         }
@@ -182,7 +184,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:summary.html.twig', array(
             'release' => $release,

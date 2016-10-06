@@ -29,6 +29,13 @@ class DataCenter
     private $name;
     
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active;
+    
+    /**
      * @ORM\OneToMany(targetEntity="Revision", mappedBy="dataCenter")
      */
     private $revisions;
@@ -104,5 +111,28 @@ class DataCenter
     public function getRevisions()
     {
         return $this->revisions;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return DataCenter
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }
