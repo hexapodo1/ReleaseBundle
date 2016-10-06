@@ -30,7 +30,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:index.html.twig', array(
             'release' => $release,
@@ -118,7 +120,7 @@ class DefaultController extends Controller
         }
         
         if ($success) { 
-            $state = "(successful)";
+            $state = "(success)";
         } else {
             $state = "(facepalm) Sorry.";
         }
@@ -182,7 +184,9 @@ class DefaultController extends Controller
             'release' => $release
         ));
         
-        $dataCenters = $dataCenterRepo->findAll();
+        $dataCenters = $dataCenterRepo->findBy(array(
+            'active' => true
+        ));
         
         return $this->render('ReleaseBundle:Default:summary.html.twig', array(
             'release' => $release,
@@ -204,5 +208,34 @@ class DefaultController extends Controller
         $entity->setPassword($passwordCodificado);    
         $em->persist($entity);
         $em->flush();
+    }
+    
+    /**
+     * @Route("/test")
+     */
+    public function testAction()
+    {
+        $hc = $this->get('hipchat');
+        $hc->config('https://www.hipchat.com/v2/room/', '2789987', 'kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je');
+        
+        $data = array(
+            "color" => "green",
+            "message" => 'juan leon bazante',
+            "notify" => false,
+            "message_format" => "html"
+        );
+
+        $hc->setData($data);
+        $hc->execute();
+        $hc->close();
+        
+        $rally = $this->get('rally');
+        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'juanbazante@hotmail.com', 'Lgbemyet-1978');
+        $json = $rally->execute('release');
+        $rally->close();
+        
+        return new JsonResponse(json_decode($json));
+        
+
     }
 }
