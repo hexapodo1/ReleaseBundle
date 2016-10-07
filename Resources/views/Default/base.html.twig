@@ -65,13 +65,14 @@
     </style>
   </head>
     <body>
+        <div id="modal-profile" style="display: none;"></div>
         <div class="container">
             
             <!-- main panel (header & content) -->
             <div id="panel-main">
                 <div class="row">
                     <div class="col-xs-12 text-muted text-right">
-                        {{ app.user.name }} (<a href="logout">Log Out</a>)&nbsp;
+                        <a id="lnk-profile" href="#">{{ app.user.name }}</a> (<a href="logout">Log Out</a>)&nbsp;
                     </div>
                 </div>
                 <div class="row">
@@ -103,6 +104,24 @@
       <script src="{{ asset('bundles/release/jquery-ui-1.11.4/jquery-ui.min.js') }}"></script>
       <script src="{{ asset('bundles/release/jstree/jstree.min.js') }}"></script>
       <!-- Include all compiled plugins (below), or include individual files as needed -->
+      <script type="text/javascript">
+          $(document).ready(function(){
+              $('#lnk-profile').click(function(e) {
+                  e.preventDefault();
+                  $('#modal-profile').dialog({
+                        modal: true,
+                        width: 500,
+                        height: 350,
+                        position: {
+                            my: "top",
+                            at: "top+50",
+                            of: document
+                        },
+                    });
+              });
+          });
+      </script>
+          
       {% block js %}
             
       {% endblock %}

@@ -27,18 +27,24 @@ class DataCenter
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
-    
+
     /**
      * @var bool
      *
      * @ORM\Column(name="active", type="boolean")
      */
     private $active;
-    
+
     /**
      * @ORM\OneToMany(targetEntity="Revision", mappedBy="dataCenter")
      */
     private $revisions;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="HipchatRoom", inversedBy="dataCenters")
+     * @ORM\JoinColumn(name="hipchatRoom_id", referencedColumnName="id")
+     */
+    private $hipchatRoom;
 
     /**
      * Get id
@@ -134,5 +140,28 @@ class DataCenter
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set hipchatRoom
+     *
+     * @param \Kishron\ReleaseBundle\Entity\HipchatRoom $hipchatRoom
+     * @return DataCenter
+     */
+    public function setHipchatRoom(\Kishron\ReleaseBundle\Entity\HipchatRoom $hipchatRoom = null)
+    {
+        $this->hipchatRoom = $hipchatRoom;
+
+        return $this;
+    }
+
+    /**
+     * Get hipchatRoom
+     *
+     * @return \Kishron\ReleaseBundle\Entity\HipchatRoom 
+     */
+    public function getHipchatRoom()
+    {
+        return $this->hipchatRoom;
     }
 }
