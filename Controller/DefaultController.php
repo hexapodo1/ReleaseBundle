@@ -211,11 +211,11 @@ class DefaultController extends Controller
     }
     
     /**
-     * @Route("/test")
+     * @Route("/test", name="test")
      */
     public function testAction()
     {
-        $hc = $this->get('hipchat');
+        /*$hc = $this->get('hipchat');
         $hc->config('https://www.hipchat.com/v2/room/', '2789987', 'kTiVRdxwscMANUunXAzfklP5SlEVS4Dtx3jcC3Je');
         
         $data = array(
@@ -234,8 +234,8 @@ class DefaultController extends Controller
         $json = $rally->execute('release');
         $rally->close();
         
-        return new JsonResponse(json_decode($json));
-        
-
+        return new JsonResponse(json_decode($json));*/
+        return $this->render('ReleaseBundle:Default:test.html.twig', array(
+        )); 
     }
 }

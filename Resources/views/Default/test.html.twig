@@ -1,0 +1,44 @@
+{% extends 'ReleaseBundle:Default:base.html.twig' %}
+{% block content %}
+
+<table id="releases_tbl" class="table table-responsive table-hover">
+    
+</table>
+    
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('body').on('click', '.release_lnk', function (){
+            alert($(this).data('release-id'));
+        });
+        $.ajax({
+            url: "{{ path('ApiRallyReleases') }}",
+            method: "GET",
+            dataType: "json",
+            data: { nameRelease: 'UI Service Pack Oct 13th 2016' },
+            success: function (data) {
+                /*$(data.QueryResult.Results).each(function(i, item){
+                    var releaseDate = new Date(item.ReleaseDate);
+                    //console.log();
+                    $('#releases_tbl').append(
+                        $('<tr>')
+                        .append(
+                            $('<td>').html(releaseDate.toLocaleDateString())
+                        ).append(
+                            $('<td>').html($('<a>')
+                                .addClass('release_lnk')
+                                .attr('data-release-id', item.ObjectUUID)
+                                .attr('href', '#')
+                                .html(item.Name)
+                                //.data('asdasd')
+                            )
+                        )    
+                    );
+                });*/
+                console.log(data);
+            }
+        });
+    });
+</script>
+{% endblock %}
