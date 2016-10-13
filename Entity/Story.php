@@ -41,6 +41,13 @@ class Story
      * @ORM\Column(name="rally_url", type="string", length=512)
      */
     private $rallyUrl;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectUUID", type="string", length=50)
+     */
+    private $objectUUID;
 
     /**
      * @ORM\ManyToOne(targetEntity="ReleaseObj", inversedBy="stories")
@@ -214,5 +221,28 @@ class Story
             }
         }
         return $reviewed;
+    }
+
+    /**
+     * Set objectUUID
+     *
+     * @param string $objectUUID
+     * @return Story
+     */
+    public function setObjectUUID($objectUUID)
+    {
+        $this->objectUUID = $objectUUID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectUUID
+     *
+     * @return string 
+     */
+    public function getObjectUUID()
+    {
+        return $this->objectUUID;
     }
 }

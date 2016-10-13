@@ -1,26 +1,98 @@
 {% extends 'ReleaseBundle:Default:base.html.twig' %}
 {% block content %}
+    <div id="releases_section">
+        <table id="releases_tbl" class="table table-responsive table-hover">
 
-<table id="releases_tbl" class="table table-responsive table-hover">
-    
-</table>
-    
+        </table>
+    </div>
+    <div id="artifacts_section" style="display: none;">
+        <table id="artifacts_tbl" class="table table-responsive table-hover table-bordered">
+
+        </table>
+        <button id="btn-send" class="btn btn-primary">Send</button>
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function(){
+        $('#btn-send').click(function(e) {
+            var artifacts = new Array; 
+            var releaseId = $(this).data('releaseid');
+            $('input:checked').each(function(i, item){
+                artifacts.push(item.value);
+            });
+            
+            $.ajax({
+                url: "{{ path('ApiRallyCreateArtifactsAndRelease') }}",
+                method: "POST",
+                dataType: "json",
+                data: { 
+                    releaseId: releaseId,
+                    artifacts: artifacts
+                },
+                success: function (data) {
+                    
+                }
+            });
+        });
         $('body').on('click', '.release_lnk', function (){
-            alert($(this).data('release-id'));
+            $('#releases_section').hide();
+            var releaseId = $(this).data('release-id');
+            $('#btn-send').attr('data-releaseId', releaseId);
+            $.ajax({
+                url: "{{ path('ApiRallyArtifactsByRelease') }}",
+                method: "GET",
+                dataType: "json",
+                data: { releaseId: releaseId },
+                success: function (data) {
+                    $('#artifacts_section').show();
+                    $(data.Defects).each(function(i, item){
+                        $('#artifacts_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html($('<input>')
+                                    .attr('type','checkbox')
+                                    .attr('checked', true)
+                                    .val(item.FormattedID)
+                                )
+                            ).append(
+                                $('<td>').html(item.FormattedID)
+                            ).append(
+                                $('<td>').html(item._refObjectName)
+                            ).append(
+                                $('<td>').html(item.Owner._refObjectName)
+                            ) 
+                        );
+                    });
+                    $(data.Stories).each(function(i, item){
+                        $('#artifacts_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html($('<input>')
+                                    .attr('type','checkbox')
+                                    .attr('checked', true)
+                                    .val(item.FormattedID)
+                                )
+                            ).append(
+                                $('<td>').html(item.FormattedID)
+                            ).append(
+                                $('<td>').html(item._refObjectName)
+                            ).append(
+                                $('<td>').html(item.Owner._refObjectName)
+                            )
+                        );
+                    });
+                }
+            });
+
+            
         });
         $.ajax({
             url: "{{ path('ApiRallyReleases') }}",
             method: "GET",
             dataType: "json",
-            data: { nameRelease: 'UI Service Pack Oct 13th 2016' },
             success: function (data) {
-                /*$(data.QueryResult.Results).each(function(i, item){
+                $(data.QueryResult.Results).each(function(i, item){
                     var releaseDate = new Date(item.ReleaseDate);
-                    //console.log();
                     $('#releases_tbl').append(
                         $('<tr>')
                         .append(
@@ -35,8 +107,7 @@
                             )
                         )    
                     );
-                });*/
-                console.log(data);
+                });
             }
         });
     });

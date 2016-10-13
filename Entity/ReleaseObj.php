@@ -41,6 +41,13 @@ class ReleaseObj
      * @ORM\Column(name="active", type="boolean")
      */
     private $active;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectUUID", type="string", length=50)
+     */
+    private $objectUUID;
 
     /**
      * @var bool
@@ -198,6 +205,29 @@ class ReleaseObj
     }
     
     public function __toString() {
-        return $this->getCode() . " - " . $this->getDate()->format('M d, Y');
+        return $this->getCode(); // . " - " . $this->getDate()->format('M d, Y');
+    }
+
+    /**
+     * Set objectUUID
+     *
+     * @param string $objectUUID
+     * @return ReleaseObj
+     */
+    public function setObjectUUID($objectUUID)
+    {
+        $this->objectUUID = $objectUUID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectUUID
+     *
+     * @return string 
+     */
+    public function getObjectUUID()
+    {
+        return $this->objectUUID;
     }
 }
