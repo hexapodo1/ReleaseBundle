@@ -44,6 +44,14 @@ class RallyConnect {
         curl_setopt($this->curl, CURLOPT_URL, $url);
         return $result = curl_exec($this->curl);
     }
+    
+    public function modify ($url, $qry_str) {
+        $payload = json_encode(array('Content' => $qry_str));
+        curl_setopt($this->curl, CURLOPT_POST, 1);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($this->curl, CURLOPT_URL, $this->baseUrl . $url . "?key= ");
+        return $result = curl_exec($this->curl);
+    }
 
     public function sendHeaderJson() {
         ob_start('ob_gzhandler');

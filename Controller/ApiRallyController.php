@@ -206,5 +206,33 @@ class ApiRallyController extends Controller
         $json=array();
         return new JsonResponse($json);
     }
+    
+    /**
+    * @Route("/updateStateArtifact", name="ApiRallyUpdateStateArtifact")
+    * @Method({"GET"})
+    */
+    public function updateStateArtifactAction(Request $request) {
+        $artifactId = $request->query->get('artifactId');
+
+        $rally = $this->get('rally');
+        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
+      
+        $jsonDefects = $rally->modify(
+                'defect/54738273858', 
+                array(
+                  //"Defect" => array(
+                    "PlanEstimate" => 1
+                  //)
+                  
+                )
+        );
+        
+        $arrayDefects = json_decode($jsonDefects, true);
+        var_dump($arrayDefects);
+        //$arrayStories = json_decode($jsonStories, true);
+        
+        $json=array();
+        return new JsonResponse($json);
+    }
 
 }
