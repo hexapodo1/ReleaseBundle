@@ -38,6 +38,13 @@ class Story
     /**
      * @var string
      *
+     * @ORM\Column(name="owner", type="string", length=255)
+     */
+    private $owner;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="rally_url", type="string", length=512)
      */
     private $rallyUrl;
@@ -244,5 +251,28 @@ class Story
     public function getObjectUUID()
     {
         return $this->objectUUID;
+    }
+
+    /**
+     * Set owner
+     *
+     * @param string $owner
+     * @return Story
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * Get owner
+     *
+     * @return string 
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 }

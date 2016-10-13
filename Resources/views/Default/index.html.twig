@@ -21,15 +21,19 @@
         <h4>{{ dataCenter.name }}</h4>
         <table class="table table-hover table-bordered table-striped" style="background-color: white">
             <tr>
+                <th>N.</th>
                 <th>Code</th>
                 <th>Name</th>
+                <th>Owner</th>
                 <th>#</th>
                 <th class="options">Revision</th>
             </tr>
             {% for story in stories %}
             <tr>
+                <td>{{ loop.index }}</td>
                 <td>{{ story.code }}</td>
                 <td><a href="{{ story.rallyUrl }}" target="_blank">{{ story.name }}</a></td>
+                <td>{{ story.owner }}</td>
                 <td><span class="review" id="review_{{ dataCenter.id }}_{{story.id}}">
                         {{ story.getReviews(dataCenter.id) }}
                     </span></td>
