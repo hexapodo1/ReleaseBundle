@@ -52,6 +52,13 @@ class Story
     /**
      * @var string
      *
+     * @ORM\Column(name="objectID", type="string", length=50)
+     */
+    private $objectID;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="objectUUID", type="string", length=50)
      */
     private $objectUUID;
@@ -274,5 +281,28 @@ class Story
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * Set objectID
+     *
+     * @param string $objectID
+     * @return Story
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectID
+     *
+     * @return string 
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
     }
 }

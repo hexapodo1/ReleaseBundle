@@ -1,15 +1,23 @@
 {% extends 'ReleaseBundle:Default:base.html.twig' %}
 {% block content %}
-    <div id="releases_section">
+    <div id="projects_section">
+        <table id="projects_tbl" class="table table-responsive table-hover">
+
+        </table>
+    </div>
+    
+    <div id="releases_section" style="display: none;">
         <table id="releases_tbl" class="table table-responsive table-hover">
 
         </table>
     </div>
+    
     <div id="artifacts_section" style="display: none;">
         <table id="artifacts_tbl" class="table table-responsive table-hover table-bordered">
 
         </table>
         <button id="btn-send" class="btn btn-primary">Send</button>
+    </div>
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
@@ -86,30 +94,61 @@
 
             
         });
+        $('body').on('click', '.project_lnk', function (){
+            $('#projects_section').hide();
+            var projectID = $(this).data('project-id');
+            var projectUUID = $(this).data('project-uuid');
+
+            $.ajax({
+                url: "{{ path('ApiRallyReleases') }}",
+                method: "GET",
+                dataType: "json",
+                data: {projectId: projectUUID},
+                success: function (data) {
+                    $('#releases_section').show();
+                    $(data.QueryResult.Results).each(function(i, item){
+                        var releaseDate = new Date(item.ReleaseDate);
+                        $('#releases_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html(releaseDate.toLocaleDateString())
+                            ).append(
+                                $('<td>').html($('<a>')
+                                    .addClass('release_lnk')
+                                    .attr('data-release-id', item.ObjectUUID)
+                                    .attr('href', '#')
+                                    .html(item.Name)
+                                )
+                            )    
+                        );
+                    });
+                }
+            });
+        });
         $.ajax({
-            url: "{{ path('ApiRallyReleases') }}",
+            url: "{{ path('ApiRallyProjects') }}",
             method: "GET",
             dataType: "json",
             success: function (data) {
-                $(data.QueryResult.Results).each(function(i, item){
-                    var releaseDate = new Date(item.ReleaseDate);
-                    $('#releases_tbl').append(
+                $(data).each(function(i, item){
+                    $('#projects_tbl').append(
                         $('<tr>')
                         .append(
-                            $('<td>').html(releaseDate.toLocaleDateString())
-                        ).append(
                             $('<td>').html($('<a>')
-                                .addClass('release_lnk')
-                                .attr('data-release-id', item.ObjectUUID)
+                                .addClass('project_lnk')
+                                .attr('data-project-id', item.objectID)
+                                .attr('data-project-uuid', item.objectUUID)
                                 .attr('href', '#')
-                                .html(item.Name)
-                                //.data('asdasd')
+                                .html(item.name)
                             )
-                        )    
-                    );
+                        )
+                    )
                 });
             }
         });
+        
+        /**/
+        
     });
 </script>
 {% endblock %}

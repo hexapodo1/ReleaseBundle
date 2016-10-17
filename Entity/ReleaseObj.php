@@ -45,6 +45,13 @@ class ReleaseObj
     /**
      * @var string
      *
+     * @ORM\Column(name="objectID", type="string", length=50)
+     */
+    private $objectID;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="objectUUID", type="string", length=50)
      */
     private $objectUUID;
@@ -229,5 +236,28 @@ class ReleaseObj
     public function getObjectUUID()
     {
         return $this->objectUUID;
+    }
+
+    /**
+     * Set objectID
+     *
+     * @param string $objectID
+     * @return ReleaseObj
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectID
+     *
+     * @return string 
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
     }
 }

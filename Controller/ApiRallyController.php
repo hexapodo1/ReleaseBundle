@@ -19,13 +19,13 @@ class ApiRallyController extends Controller
      * @Route("/releases", name="ApiRallyReleases")
      * @Method({"GET"})
      */
-    public function activeReleasesAction()
+    public function activeReleasesAction(Request $request)
     {
+        $projectId = $request->query->get('projectId');
         $rally = $this->get('rally');
-        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
         $json = $rally->execute(
                 'release',
-                '((Project.ObjectUUID = a7ee09d8-d5a6-48d0-bf1b-7a0b4ff71b94) and (State = Active))',
+                '((Project.ObjectUUID = "' . $projectId . '") and (State = "Active"))',
                 'ReleaseDate DESC',
                 'Name,ReleaseDate,ObjectUUID'
             );
@@ -42,7 +42,6 @@ class ApiRallyController extends Controller
     {
         $nameRelease = $request->query->get('nameRelease');
         $rally = $this->get('rally');
-        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
         $jsonDefects = $rally->execute(
                 'defect',
                 '(Release.Name = "' . $nameRelease . '")',
@@ -74,7 +73,6 @@ class ApiRallyController extends Controller
     public function artifactsByReleaseAction(Request $request) {
         $releaseId = $request->query->get('releaseId');
         $rally = $this->get('rally');
-        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
         $jsonDefects = $rally->execute(
                 'defect', 
                 '(Release.ObjectUUID = "' . $releaseId . '")', 
@@ -111,13 +109,12 @@ class ApiRallyController extends Controller
         $storyRepo = $em->getRepository('ReleaseBundle:Story');
         
         $rally = $this->get('rally');
-        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
         
         $jsonRelease = $rally->execute(
                 'release',
                 '(ObjectUUID = "' . $releaseId . '")',
                 '',
-                'Name,ReleaseDate,ObjectUUID,Project'
+                'Name,ReleaseDate,ObjectID,ObjectUUID,Project'
             );
         
         $jsonDefects = $rally->execute(
@@ -150,6 +147,7 @@ class ApiRallyController extends Controller
             $release->setSuccess(0);
             $release->setCode($arrayRelease['QueryResult']['Results'][0]['Name']);
             $release->setDate(new \DateTime($arrayRelease['QueryResult']['Results'][0]['ReleaseDate']));
+            $release->setObjectID($arrayRelease['QueryResult']['Results'][0]['ObjectID']);
             $release->setObjectUUID($arrayRelease['QueryResult']['Results'][0]['ObjectUUID']);
             $em->persist($release);
         }
@@ -163,6 +161,7 @@ class ApiRallyController extends Controller
                     $story = new Story();
                     $story->setCode($result['FormattedID']);
                     $story->setName($result['_refObjectName']);
+                    $story->setObjectID($result['ObjectID']);
                     $story->setObjectUUID($result['ObjectUUID']);
                     $story->setOwner($result['Owner']['_refObjectName']);
                     $testRun = '';
@@ -186,6 +185,7 @@ class ApiRallyController extends Controller
                     $story = new Story();
                     $story->setCode($result['FormattedID']);
                     $story->setName($result['_refObjectName']);
+                    $story->setObjectID($result['ObjectID']);
                     $story->setObjectUUID($result['ObjectUUID']);
                     $story->setOwner($result['Owner']['_refObjectName']);
                     $testRun = '';
@@ -208,31 +208,80 @@ class ApiRallyController extends Controller
     }
     
     /**
-    * @Route("/updateStateArtifact", name="ApiRallyUpdateStateArtifact")
+    * @Route("/updateStateArtifacts", name="ApiRallyUpdateStateArtifacts")
     * @Method({"GET"})
     */
-    public function updateStateArtifactAction(Request $request) {
-        $artifactId = $request->query->get('artifactId');
-
+    public function updateStateArtifactsAction(Request $request) {
+        
         $rally = $this->get('rally');
-        $rally->config('https://rally1.rallydev.com/slm/webservice/v2.0/', 'jleon@alertlogic.com', '2hL}Vo}UgyZ5');
-      
-        $jsonDefects = $rally->modify(
-                'defect/54738273858', 
-                array(
-                  //"Defect" => array(
-                    "PlanEstimate" => 1
-                  //)
-                  
-                )
+
+        $jsonDefects = $rally->execute(
+                'defect', 
+                '(Release.ObjectUUID = "b35810bb-0299-4d89-bed5-a5114691d71c")', 
+                'FormattedID ASC', 
+                'ObjectID,FormattedID'
+        );
+        $jsonStories = $rally->execute(
+                'hierarchicalrequirement', 
+                '(Release.ObjectUUID = "b35810bb-0299-4d89-bed5-a5114691d71c")', 
+                'FormattedID ASC', 
+                'ObjectID,FormattedID'
         );
         
         $arrayDefects = json_decode($jsonDefects, true);
-        var_dump($arrayDefects);
-        //$arrayStories = json_decode($jsonStories, true);
+        $arrayStories = json_decode($jsonStories, true);
+        var_dump($arrayStories['QueryResult']['Results']);
+        exit();
         
-        $json=array();
+        foreach($arrayDefects['QueryResult']['Results'] as $defect) {
+            $id = $defect['ObjectID'];
+            $payload = array(
+                "defect" => array(
+                    "c_scrumfield"  => "Released",
+                    "ScheduleState" => "Released",
+                    "State"         => "Closed"
+                )
+            );
+            $asd = $rally->update($id, $payload, 'defect');
+            //var_dump($defect['FormattedID']);
+        }
+        foreach($arrayStories['QueryResult']['Results'] as $defect) {
+            $id = $defect['ObjectID'];
+            $payload = array(
+                "hierarchicalrequirement" => array(
+                    "c_scrumfield"  => "Released",
+                    "ScheduleState" => "Released"
+                )
+            );
+            $asd = $rally->update($id, $payload, 'hierarchicalrequirement');
+            //var_dump($defect['FormattedID']);
+        }
+        exit();
+        
         return new JsonResponse($json);
+    }
+    
+    /**
+     * @Route("/projects", name="ApiRallyProjects")
+     * @Method({"GET"})
+     */
+    public function projectsAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $projectsToView = array();
+        $projectRepo = $em->getRepository('ReleaseBundle:Project');
+        
+        $projects = $projectRepo->findAll();
+        
+        foreach ($projects as $project) {
+            $projectsToView[] = array(
+                'name' => $project->getName(),
+                'objectID' => $project->getObjectID(),
+                'objectUUID' => $project->getObjectUUID(),
+            );
+        }
+
+        return new JsonResponse($projectsToView);
     }
 
 }

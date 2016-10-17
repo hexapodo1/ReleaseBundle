@@ -7,3 +7,4 @@ services:
 
     Rally:
         class: Kishron\ReleaseBundle\Services\RallyConnect
+        arguments: ["@service_container"]

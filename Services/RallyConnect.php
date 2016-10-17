@@ -1,6 +1,8 @@
 <?php
 namespace Kishron\ReleaseBundle\Services;
 
+use Symfony\Component\DependencyInjection\Container;
+
 /**
  * Allow to connect to Rally API
  * @Author Juan Leon
@@ -11,12 +13,16 @@ class RallyConnect {
     private $baseUrl;
     private $username;
     private $password;
+    private $key;
     private $curl;
 
-    public function config($baseUrl, $username, $password) {
-        $this->baseUrl = $baseUrl;
-        $this->username = $username;
-        $this->password = $password;
+    public function __construct(Container $container) {
+        $releaseapp = $container->getParameter('releaseapp');
+
+        $this->baseUrl = $releaseapp['rallyBaseUrl'];;
+        $this->username = $releaseapp['rallyUserLogin'];
+        $this->password = $releaseapp['rallyUserPassword'];;
+        $this->key = $releaseapp['rallyUserApi'];;
         $this->_init();
     }
 
@@ -45,14 +51,6 @@ class RallyConnect {
         return $result = curl_exec($this->curl);
     }
     
-    public function modify ($url, $qry_str) {
-        $payload = json_encode(array('Content' => $qry_str));
-        curl_setopt($this->curl, CURLOPT_POST, 1);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($this->curl, CURLOPT_URL, $this->baseUrl . $url . "?key= ");
-        return $result = curl_exec($this->curl);
-    }
-
     public function sendHeaderJson() {
         ob_start('ob_gzhandler');
         header('Content-type: application/json');
@@ -60,6 +58,21 @@ class RallyConnect {
 
     public function close() {
         curl_close($this->curl);
+    }
+    
+    public function update($id, $params, $type) {
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array(
+            'zsessionid:' . $this->key,
+            'Content-Type: application/json'
+        ));
+        $payload = json_encode($params);
+        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($this->curl, CURLOPT_POST, true);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($this->curl, CURLOPT_URL, 
+            'https://rally1.rallydev.com/slm/webservice/v2.0/' . $type . '/' . $id
+        );
+        return $result = curl_exec($this->curl);
     }
 
 }
