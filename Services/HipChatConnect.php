@@ -1,6 +1,8 @@
 <?php
 namespace Kishron\ReleaseBundle\Services;
 
+use Symfony\Component\DependencyInjection\Container;
+
 /**
  * Allow to connect to HipChat API
  * @Author Juan Leon
@@ -13,10 +15,12 @@ class HipChatConnect {
     private $authToken;
     private $curl;
 
-    public function config($baseUrl, $roomId, $authToken) {
-        $this->baseUrl = $baseUrl;
-        $this->roomId = $roomId;
-        $this->authToken = $authToken;
+    public function __construct(Container $container) {
+        $parameters = $container->getParameter('hipchat');
+        
+        $this->baseUrl = $parameters['baseUrl'];
+        $this->roomId = $parameters['roomId'];
+        $this->authToken = $parameters['authToken'];
         $this->_init();
     }
 
@@ -36,7 +40,7 @@ class HipChatConnect {
     public function execute() {
         $url = $this->baseUrl . $this->roomId . "/notification?auth_token=" . $this->authToken;
         curl_setopt($this->curl, CURLOPT_URL, $url);
-        return $result = curl_exec($this->curl);
+        return $result = json_decode(curl_exec($this->curl), true);
     }
 
     public function sendHeaderJson() {

@@ -17,12 +17,12 @@ class RallyConnect {
     private $curl;
 
     public function __construct(Container $container) {
-        $releaseapp = $container->getParameter('releaseapp');
+        $parameters = $container->getParameter('rally');
 
-        $this->baseUrl = $releaseapp['rallyBaseUrl'];;
-        $this->username = $releaseapp['rallyUserLogin'];
-        $this->password = $releaseapp['rallyUserPassword'];;
-        $this->key = $releaseapp['rallyUserApi'];;
+        $this->baseUrl = $parameters['baseUrl'];
+        $this->username = $parameters['userLogin'];
+        $this->password = $parameters['userPassword'];
+        $this->key = $parameters['userApi'];
         $this->_init();
     }
 

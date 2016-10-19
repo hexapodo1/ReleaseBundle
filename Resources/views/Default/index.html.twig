@@ -110,35 +110,21 @@
             e.preventDefault();
             modal.dialog("close");
             
-            {#var card = {
-                "style": "link",
-                "url": "http://i0.kym-cdn.com/photos/images/newsfeed/000/131/786/tumblr_ljkeuyjp1a1qafrh6.gif",
-                "id": "fee4d9a3-685d-4cbd-abaa-c8850d9b1960",
-                "title": "My test",
-                "description": {
-                    "format": "html",
-                    "value": "<b>Add-on link:</b> <a href='#' data-target='hip-connect-tester:hctester.dialog.simple' data-target-options='{\"options\":{\"title\":\"Custom Title\"}, \"parameters\":{\"from\":\"link\"}}'>Open Dialog with parameters</a>"
-                },
-                "icon": {
-                    "url": "http://icons.iconarchive.com/icons/designbolts/hand-stitched/24/RSS-icon.png"
-                },
-                "date": 1443057955792
-            }#}
-            
             $.ajax({
                 url: "{{ path('summary') }}",
                 method: "POST",
                 dataType: "html",
                 success: function (data) {
                     $.ajax({
-                        url: "https://alertlogic.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
+                        url: "{{ path('ApiHCSendMessage') }}",
                         method: "POST",
                         data: {
-                            "color": "green",
-                            "message": data,
-                            //"card": card,
-                            "notify": false,
-                            "message_format": "html"
+                            "parameters": {
+                                "color": "green",
+                                "message": data,
+                                "notify": false,
+                                "message_format": "html"
+                            }
                         },
                         dataType: "json",
                     });
@@ -156,7 +142,6 @@
                 success: function (data) {
                     $('.review').html('0');
                     for(var propt in data){
-                        //console.log(propt + ': ');
                         var obj = data[propt];
                         for (var propt2 in obj) {
                             // using jquery selectors causes error (a jquery bug)
@@ -166,7 +151,7 @@
                     }
                 }
             });
-        }, {{ releaseApp.refresh * 1000 }} );
+        }, {{ hipchat.refresh * 1000 }} );
         $( "#tabs" ).tabs();
         $('.btn-action').click(function(e){
             e.preventDefault();
@@ -199,17 +184,18 @@
                             }
                             button.parent().parent().find('.review').html(data.n);
                             $.ajax({
-                                url: "https://alertlogic.hipchat.com/v2/room/{{ releaseApp.hipchat_room }}/notification?auth_token={{ releaseApp.hipchat_integration_token }}",
+                                url: "{{ path('ApiHCSendMessage') }}",
                                 method: "POST",
                                 data: {
-                                    "color": color,
-                                    "message": data.message,
-                                    "notify": false,
-                                    "message_format": "text"
+                                    "parameters": {
+                                        "color": color,
+                                        "message": data.message,
+                                        "notify": false,
+                                        "message_format": "text"
+                                    }
                                 },
                                 dataType: "json",
                                 success: function (data) {
-                                    console.log(data);
                                 }
                             });
                         }

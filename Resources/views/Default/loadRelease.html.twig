@@ -46,6 +46,7 @@
             $('#releases_section').hide();
             var releaseId = $(this).data('release-id');
             $('#btn-send').attr('data-releaseId', releaseId);
+            var nArtifacts=1;
             $.ajax({
                 url: "{{ path('ApiRallyArtifactsByRelease') }}",
                 method: "GET",
@@ -56,6 +57,9 @@
                     $(data.Defects).each(function(i, item){
                         $('#artifacts_tbl').append(
                             $('<tr>')
+                            .append(
+                                $('<td>').html(nArtifacts++)
+                            )
                             .append(
                                 $('<td>').html($('<input>')
                                     .attr('type','checkbox')
@@ -74,6 +78,9 @@
                     $(data.Stories).each(function(i, item){
                         $('#artifacts_tbl').append(
                             $('<tr>')
+                            .append(
+                                $('<td>').html(nArtifacts++)
+                            )
                             .append(
                                 $('<td>').html($('<input>')
                                     .attr('type','checkbox')
