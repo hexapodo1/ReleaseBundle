@@ -105,6 +105,7 @@ class ApiRallyController extends Controller
         $releaseId = $request->request->get('releaseId');
         $artifacts = $request->request->get('artifacts');
         $em = $this->getDoctrine()->getManager();
+        $projecteRepo = $em->getRepository('ReleaseBundle:Project');
         $releaseRepo = $em->getRepository('ReleaseBundle:ReleaseObj');
         $storyRepo = $em->getRepository('ReleaseBundle:Story');
         
@@ -142,6 +143,10 @@ class ApiRallyController extends Controller
             'objectUUID' => $releaseId
         ));
         if (!$release) {
+            $projectUUID = $arrayRelease['QueryResult']['Results'][0]['Project']['ObjectUUID'];
+            $project = $projecteRepo->findOneBy(array(
+                'objectUUID' => $projectUUID
+            ));
             $release = new ReleaseObj();
             $release->setActive(1);
             $release->setSuccess(0);
@@ -149,6 +154,7 @@ class ApiRallyController extends Controller
             $release->setDate(new \DateTime($arrayRelease['QueryResult']['Results'][0]['ReleaseDate']));
             $release->setObjectID($arrayRelease['QueryResult']['Results'][0]['ObjectID']);
             $release->setObjectUUID($arrayRelease['QueryResult']['Results'][0]['ObjectUUID']);
+            $release->setProject($project);
             $em->persist($release);
         }
         

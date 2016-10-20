@@ -67,7 +67,12 @@ class ReleaseObj
      * @ORM\OneToMany(targetEntity="Story", mappedBy="release")
      */
     private $stories;
-
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Project", inversedBy="releases")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
+     */
+    private $project;
 
     /**
      * Get id
@@ -259,5 +264,28 @@ class ReleaseObj
     public function getObjectID()
     {
         return $this->objectID;
+    }
+
+    /**
+     * Set project
+     *
+     * @param \Kishron\ReleaseBundle\Entity\Project $project
+     * @return ReleaseObj
+     */
+    public function setProject(\Kishron\ReleaseBundle\Entity\Project $project = null)
+    {
+        $this->project = $project;
+
+        return $this;
+    }
+
+    /**
+     * Get project
+     *
+     * @return \Kishron\ReleaseBundle\Entity\Project 
+     */
+    public function getProject()
+    {
+        return $this->project;
     }
 }
