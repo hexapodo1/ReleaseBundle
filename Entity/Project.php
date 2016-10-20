@@ -41,6 +41,11 @@ class Project
      * @ORM\Column(name="objectUUID", type="string", length=50)
      */
     private $objectUUID;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="ReleaseObj", mappedBy="project")
+     */
+    private $releases;
 
     /**
      * Get id
@@ -120,5 +125,45 @@ class Project
     public function getObjectUUID()
     {
         return $this->objectUUID;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->releases = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add releases
+     *
+     * @param \Kishron\ReleaseBundle\Entity\ReleaseObj $releases
+     * @return Project
+     */
+    public function addRelease(\Kishron\ReleaseBundle\Entity\ReleaseObj $releases)
+    {
+        $this->releases[] = $releases;
+
+        return $this;
+    }
+
+    /**
+     * Remove releases
+     *
+     * @param \Kishron\ReleaseBundle\Entity\ReleaseObj $releases
+     */
+    public function removeRelease(\Kishron\ReleaseBundle\Entity\ReleaseObj $releases)
+    {
+        $this->releases->removeElement($releases);
+    }
+
+    /**
+     * Get releases
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getReleases()
+    {
+        return $this->releases;
     }
 }
