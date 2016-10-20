@@ -41,6 +41,20 @@ class ReleaseObj
      * @ORM\Column(name="active", type="boolean")
      */
     private $active;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectID", type="string", length=50)
+     */
+    private $objectID;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectUUID", type="string", length=50)
+     */
+    private $objectUUID;
 
     /**
      * @var bool
@@ -53,7 +67,12 @@ class ReleaseObj
      * @ORM\OneToMany(targetEntity="Story", mappedBy="release")
      */
     private $stories;
-
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Project", inversedBy="releases")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
+     */
+    private $project;
 
     /**
      * Get id
@@ -198,6 +217,75 @@ class ReleaseObj
     }
     
     public function __toString() {
-        return $this->getCode() . " - " . $this->getDate()->format('M d, Y');
+        return $this->getCode(); // . " - " . $this->getDate()->format('M d, Y');
+    }
+
+    /**
+     * Set objectUUID
+     *
+     * @param string $objectUUID
+     * @return ReleaseObj
+     */
+    public function setObjectUUID($objectUUID)
+    {
+        $this->objectUUID = $objectUUID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectUUID
+     *
+     * @return string 
+     */
+    public function getObjectUUID()
+    {
+        return $this->objectUUID;
+    }
+
+    /**
+     * Set objectID
+     *
+     * @param string $objectID
+     * @return ReleaseObj
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectID
+     *
+     * @return string 
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
+    }
+
+    /**
+     * Set project
+     *
+     * @param \Kishron\ReleaseBundle\Entity\Project $project
+     * @return ReleaseObj
+     */
+    public function setProject(\Kishron\ReleaseBundle\Entity\Project $project = null)
+    {
+        $this->project = $project;
+
+        return $this;
+    }
+
+    /**
+     * Get project
+     *
+     * @return \Kishron\ReleaseBundle\Entity\Project 
+     */
+    public function getProject()
+    {
+        return $this->project;
     }
 }

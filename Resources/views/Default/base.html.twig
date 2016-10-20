@@ -71,7 +71,7 @@
             <div id="panel-main">
                 <div class="row">
                     <div class="col-xs-12 text-muted text-right">
-                        {{ app.user.name }} (<a href="logout">Log Out</a>)&nbsp;
+                        {% if app.user %}{{ app.user.name }}{% endif %} (<a href="logout">Log Out</a>)&nbsp;
                     </div>
                 </div>
                 <div class="row">

@@ -1,3 +1,4 @@
+{% spaceless %}
     <table border="1" class="table table-bordered table-striped" >
         <tr>
             <th colspan="{{ dataCenters | length + 1 }}" valign="bottom">
@@ -20,7 +21,7 @@
         {% for story in stories %}
         <tr>
             <td>
-                <strong>{{ story.code }}</strong> - {{ story.name }}
+                <strong>{{ story.code }}</strong> - {{ story.name | truncate(60) }}
             </td>
             {% for dataCenter in dataCenters%}
             <td>
@@ -31,3 +32,4 @@
         </tr>
         {% endfor %}
     </table>
+{% endspaceless %}

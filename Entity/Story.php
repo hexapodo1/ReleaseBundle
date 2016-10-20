@@ -38,9 +38,30 @@ class Story
     /**
      * @var string
      *
+     * @ORM\Column(name="owner", type="string", length=255)
+     */
+    private $owner;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="rally_url", type="string", length=512)
      */
     private $rallyUrl;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectID", type="string", length=50)
+     */
+    private $objectID;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="objectUUID", type="string", length=50)
+     */
+    private $objectUUID;
 
     /**
      * @ORM\ManyToOne(targetEntity="ReleaseObj", inversedBy="stories")
@@ -214,5 +235,74 @@ class Story
             }
         }
         return $reviewed;
+    }
+
+    /**
+     * Set objectUUID
+     *
+     * @param string $objectUUID
+     * @return Story
+     */
+    public function setObjectUUID($objectUUID)
+    {
+        $this->objectUUID = $objectUUID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectUUID
+     *
+     * @return string 
+     */
+    public function getObjectUUID()
+    {
+        return $this->objectUUID;
+    }
+
+    /**
+     * Set owner
+     *
+     * @param string $owner
+     * @return Story
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * Get owner
+     *
+     * @return string 
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set objectID
+     *
+     * @param string $objectID
+     * @return Story
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+
+        return $this;
+    }
+
+    /**
+     * Get objectID
+     *
+     * @return string 
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
     }
 }

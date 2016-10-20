@@ -11,7 +11,7 @@ use Kishron\ReleaseBundle\Entity\Revision;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/")
+     * @Route("/", name="home")
      */
     public function indexAction()
     {
@@ -208,5 +208,13 @@ class DefaultController extends Controller
         $entity->setPassword($passwordCodificado);    
         $em->persist($entity);
         $em->flush();
+    }
+    
+    /**
+     * @Route("/loadRelease", name="loadRelease")
+     */
+    public function testAction()
+    {
+        return $this->render('ReleaseBundle:Default:loadRelease.html.twig', array()); 
     }
 }

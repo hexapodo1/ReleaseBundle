@@ -2,3 +2,10 @@ services:
 #    release.example:
 #        class: Kishron\ReleaseBundle\Example
 #        arguments: ["@service_id", "plain_value", %parameter%]
+    HipChat:
+        class: Kishron\ReleaseBundle\Services\HipChatConnect
+        arguments: ["@service_container"]
+
+    Rally:
+        class: Kishron\ReleaseBundle\Services\RallyConnect
+        arguments: ["@service_container"]
