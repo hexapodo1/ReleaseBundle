@@ -16,7 +16,8 @@
         <table id="artifacts_tbl" class="table table-responsive table-hover table-bordered">
 
         </table>
-        <button id="btn-send" class="btn btn-primary">Send</button>
+        <button id="btn-send" class="btn btn-primary">Import from RallyDev</button>
+        <br><br>
     </div>
 {% endblock %}
 {% block js %}
@@ -38,7 +39,7 @@
                     artifacts: artifacts
                 },
                 success: function (data) {
-                    
+                    $(location).attr('href', '{{ path('home') }}'); 
                 }
             });
         });
