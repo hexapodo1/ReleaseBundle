@@ -143,6 +143,7 @@ class DefaultController extends Controller
     public function statusStoriesAction()
     {
         $em = $this->getDoctrine()->getManager();
+        $storyCount = array();
         
         // repos
         $revisionRepo = $em->getRepository("ReleaseBundle:Revision");
@@ -151,16 +152,18 @@ class DefaultController extends Controller
         $release = $releaseRepo->findOneBy(array(
             'active' => true
         ));
-        $revisions = $revisionRepo->getRevisionsByRelease($release->getId());
         
-        $storyCount = array();
-        foreach ($revisions as $revision) {
-            if (isset($storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()])) {
-                $storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()]++;
-            } else {
-                $storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()] = 1;
+        if ($release) {
+            $revisions = $revisionRepo->getRevisionsByRelease($release->getId());
+            foreach ($revisions as $revision) {
+                if (isset($storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()])) {
+                    $storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()]++;
+                } else {
+                    $storyCount[$revision->getDataCenter()->getId()][$revision->getStory()->getId()] = 1;
+                }
             }
         }
+        
         return new JsonResponse($storyCount);
     }
     
