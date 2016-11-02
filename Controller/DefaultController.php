@@ -216,7 +216,7 @@ class DefaultController extends Controller
     /**
      * @Route("/loadRelease", name="loadRelease")
      */
-    public function testAction()
+    public function loadReleaseAction()
     {
         return $this->render('ReleaseBundle:Default:loadRelease.html.twig', array()); 
     }
