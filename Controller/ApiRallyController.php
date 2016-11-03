@@ -11,7 +11,7 @@ use Kishron\ReleaseBundle\Entity\ReleaseObj;
 use Kishron\ReleaseBundle\Entity\Story;
 
 /**
- * @Route("/api/rally")
+ * @Route("/api/rally/v1")
  */
 class ApiRallyController extends Controller
 {

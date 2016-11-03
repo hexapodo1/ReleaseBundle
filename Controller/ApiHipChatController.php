@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * @Route("/api/hc")
+ * @Route("/api/hc/v1")
  */
 class ApiHipChatController extends Controller
 {
