@@ -9,3 +9,7 @@ services:
     Rally:
         class: Kishron\ReleaseBundle\Services\RallyConnect
         arguments: ["@service_container"]
+        
+    Zendesk:
+        class: Kishron\ReleaseBundle\Services\ZendeskConnect
+        arguments: ["@service_container"]

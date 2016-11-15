@@ -73,6 +73,11 @@ class ReleaseObj
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="UserRelease", mappedBy="release")
+     */
+    private $usersReleases;
 
     /**
      * Get id
@@ -175,14 +180,15 @@ class ReleaseObj
     {
         return $this->success;
     }
+    
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->stories = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->usersReleases = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
     /**
      * Add stories
      *
@@ -288,4 +294,39 @@ class ReleaseObj
     {
         return $this->project;
     }
+
+    /**
+     * Add usersRelease
+     *
+     * @param \Kishron\ReleaseBundle\Entity\UserRelease $usersRelease
+     *
+     * @return ReleaseObj
+     */
+    public function addUsersRelease(\Kishron\ReleaseBundle\Entity\UserRelease $usersRelease)
+    {
+        $this->usersReleases[] = $usersRelease;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersRelease
+     *
+     * @param \Kishron\ReleaseBundle\Entity\UserRelease $usersRelease
+     */
+    public function removeUsersRelease(\Kishron\ReleaseBundle\Entity\UserRelease $usersRelease)
+    {
+        $this->usersReleases->removeElement($usersRelease);
+    }
+
+    /**
+     * Get usersReleases
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsersReleases()
+    {
+        return $this->usersReleases;
+    }
+
 }

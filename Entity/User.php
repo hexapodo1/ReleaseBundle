@@ -51,6 +51,11 @@ class User implements UserInterface, \Serializable
      * @ORM\OneToMany(targetEntity="Revision", mappedBy="user")
      */
     private $revisions;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="UserRelease", mappedBy="user")
+     */
+    private $usersReleases;
 
     /**
      * Get id
@@ -107,12 +112,14 @@ class User implements UserInterface, \Serializable
     {
         return $this->password;
     }
+    
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->revisions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->usersReleases = new \Doctrine\Common\Collections\ArrayCollection();
         $this->isActive = true;
         // may not be needed, see section on salt below
         // $this->salt = md5(uniqid(null, true));
@@ -228,4 +235,39 @@ class User implements UserInterface, \Serializable
     {
         return $this->salt;
     }
+
+    /**
+     * Add usersRelease
+     *
+     * @param \Kishron\ReleaseBundle\Entity\UserRelease $usersRelease
+     *
+     * @return User
+     */
+    public function addUsersRelease(\Kishron\ReleaseBundle\Entity\UserRelease $usersRelease)
+    {
+        $this->usersReleases[] = $usersRelease;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersRelease
+     *
+     * @param \Kishron\ReleaseBundle\Entity\UserRelease $usersRelease
+     */
+    public function removeUsersRelease(\Kishron\ReleaseBundle\Entity\UserRelease $usersRelease)
+    {
+        $this->usersReleases->removeElement($usersRelease);
+    }
+
+    /**
+     * Get usersReleases
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsersReleases()
+    {
+        return $this->usersReleases;
+    }
+    
 }
