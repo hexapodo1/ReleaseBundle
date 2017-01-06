@@ -19,10 +19,35 @@ class ApiZendeskController extends Controller
     
     
     /**
-    * @Route("/updateTicket", name="ApiZendeskUpdateTicket")
+    * @Route("/updateTickets", name="ApiZendeskUpdateTickets")
+    * @Method({"POST"})
+    */
+    public function updateTicketsAction(Request $request) {
+        $tickets = $request->request->get('tickets');
+        $zendesk = $this->get('zendesk');
+        foreach ($tickets as $ticket) {
+            $payload = array(
+                "ticket" => array(
+                    "comment" => array(
+                        "html_body" => $ticket['message'],
+                        "public" => false
+                    )
+                )
+            );
+            if (9523!=$ticket['id'] )
+                $responseJson = $zendesk->updateTicket($ticket['id'], $payload, 'tickets');
+        }
+        $response = array(
+          'success' => true
+        );
+        return new JsonResponse($response);
+    }
+    
+    /**
+    * @Route("/updateTicketBk", name="ApiZendeskUpdateTicketBk")
     * @Method({"GET"})
     */
-    public function updateTicketAction(Request $request) {
+    public function _updateTicketAction(Request $request) {
         $zendeskConfig = $this->container->getParameter('zendesk');
         if ($zendeskConfig['debug']) {
             ini_set('xdebug.var_display_max_depth', -1);

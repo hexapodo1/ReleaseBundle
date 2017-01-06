@@ -14,6 +14,11 @@
         <button id="btn-send" class="btn btn-primary">Send comments to Zendesk</button>
         <br><br>
     </div>
+    <div id="continue_section" style="display: none">
+        <h2>Success</h2>
+        <button id="btn-continue" class="btn btn-primary">Continue...</button>
+        <br><br>
+    </div>
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
@@ -44,8 +49,9 @@
                             var code = item.release.code;
                             var date = item.release.date;
                             content = $('<textarea>')
-                                        .attr('cols', 90)
+                                        .attr('cols', 80)
                                         .attr('rows', 4)
+                                        .attr('data-ticketId', item.zendeskTicketId)
                                         .html('This was fixed and released to production as part of ' 
                                         + code + ', on ' + date + '.');
                             check = $('<td>').html($('<input>')
@@ -70,48 +76,39 @@
                             ) 
                         );
                     });
-                    //$(location).attr('href', '{{ path('home') }}'); 
                 }
             });
         });
-        $('body').on('click', '#btn-update', function (){
-            
-
-            
-        });
-        /*$('body').on('click', '.project_lnk', function (){
-            $('#projects_section').hide();
-            var projectID = $(this).data('project-id');
-            var projectUUID = $(this).data('project-uuid');
-
+        $('body').on('click', '#btn-continue', function (e){
+            e.preventDefault();
+            $(location).attr('href', '{{ path('home') }}');
+        })
+        
+        $('body').on('click', '#btn-send', function (e){
+            e.preventDefault();
+            var tickets = new Array();
+            $('textarea').each(function (i, item) {
+                var ticket = {
+                    id: $(item).data('ticketid'),
+                    message: $(item).val()
+                };
+                tickets.push(ticket);
+            });
+            //console.log(tickets);
             $.ajax({
-                url: "{{ path('ApiRallyReleases') }}",
-                method: "GET",
+                url: "{{ path('ApiZendeskUpdateTickets') }}",
+                method: "POST",
                 dataType: "json",
-                data: {projectId: projectUUID},
+                data: {
+                    tickets: tickets
+                },
                 success: function (data) {
-                    $('#releases_section').show();
-                    $(data.QueryResult.Results).each(function(i, item){
-                        var releaseDate = new Date(item.ReleaseDate);
-                        $('#releases_tbl').append(
-                            $('<tr>')
-                            .append(
-                                $('<td>').html(releaseDate.toLocaleDateString())
-                            ).append(
-                                $('<td>').html($('<a>')
-                                    .addClass('release_lnk')
-                                    .attr('data-release-id', item.ObjectUUID)
-                                    .attr('href', '#')
-                                    .html(item.Name)
-                                )
-                            )    
-                        );
-                    });
+                    $('#to_zendesk_section').hide();
+                    $('#continue_section').show();
                 }
             });
         });
         
-         */
         var nArtifacts=1;
         $.ajax({
             url: "{{ path('artifactsByActiveRelease') }}",

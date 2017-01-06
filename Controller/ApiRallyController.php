@@ -235,10 +235,10 @@ class ApiRallyController extends Controller
             if ($type === 'DE') {
                 $payload = array(
                     "defect" => array(
-//                        "c_scrumfield"  => "Released",
-//                        "ScheduleState" => "Released",
-                        "ScheduleState" => "Accepted",
-//                        "State"         => "Closed"
+                        "c_scrumfield"  => "Released",
+                        "ScheduleState" => "Released",
+//                        "ScheduleState" => "Accepted",
+                        "State"         => "Closed"
                     )
                 );
                 $response = json_decode($rally->update($id, $payload, 'defect'), true);
@@ -268,9 +268,9 @@ class ApiRallyController extends Controller
             } else {
                 $payload = array(
                     "defect" => array(
-//                        "c_scrumfield"  => "Released",
-//                        "ScheduleState" => "Released",
-                        "ScheduleState" => "Accepted",
+                        "c_scrumfield"  => "Released",
+                        "ScheduleState" => "Released",
+//                        "ScheduleState" => "Accepted",
                     )
                 );
                 $response = json_decode($rally->update($id, $payload, 'hierarchicalrequirement'), true);
