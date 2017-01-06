@@ -220,4 +220,37 @@ class DefaultController extends Controller
     {
         return $this->render('ReleaseBundle:Default:loadRelease.html.twig', array()); 
     }
+    
+    /**
+     * @Route("/closeRelease", name="closeRelease")
+     */
+    public function closeReleaseAction()
+    {
+        return $this->render('ReleaseBundle:Default:closeRelease.html.twig', array()); 
+    }
+    
+    /**
+     * @Route("/artifactsByActiveRelease", name="artifactsByActiveRelease")
+     */
+    public function artifactsByActiveReleaseAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $releaseRepo = $em->getRepository('ReleaseBundle:ReleaseObj');
+        $release = $releaseRepo->findOneBy(array(
+            'active' => true
+        ));
+        $artefacts = array();
+        foreach ($release->getStories() as $artefact) {
+            $artefacts[] = array(
+                'code'=>    $artefact->getCode(),
+                'name'=>    $artefact->getName(),
+                'owner'=>   $artefact->getOwner(),
+                'id' =>     $artefact->getObjectID()
+                
+            );
+        }
+        return new JsonResponse($artefacts);
+    }
+    
+    
 }

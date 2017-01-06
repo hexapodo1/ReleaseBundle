@@ -214,6 +214,102 @@ class ApiRallyController extends Controller
     }
     
     /**
+    * @Route("/closeArtifacts", name="ApiRallyCloseArtifacts")
+    * @Method({"POST"})
+    */
+    public function closeArtifactsAction(Request $request) {
+        $em = $this->getDoctrine()->getManager();
+        $releaseRepo = $em->getRepository('ReleaseBundle:ReleaseObj');
+        $release = $releaseRepo->findOneBy(array(
+            'active' => true
+        ));
+        $artifacts = $request->request->get('artifacts');
+        $rallyConfig = $this->container->getParameter('rally');
+        $zendeskField = $rallyConfig['zendeskField'];
+        $rally = $this->get('rally');
+        $artifactsToUpdate = array();
+        foreach($artifacts as $artifact) {
+            $artifactArray = explode(':', $artifact);
+            $type = substr($artifactArray[0], 0, 2);
+            $id = $artifactArray[1];
+            if ($type === 'DE') {
+                $payload = array(
+                    "defect" => array(
+//                        "c_scrumfield"  => "Released",
+//                        "ScheduleState" => "Released",
+                        "ScheduleState" => "Accepted",
+//                        "State"         => "Closed"
+                    )
+                );
+                $response = json_decode($rally->update($id, $payload, 'defect'), true);
+                if(array_key_exists('Object', $response['OperationResult'])) {
+                    $object = $response['OperationResult']['Object'];
+                    $zendeskTicket = array_key_exists($zendeskField, $object) ? trim($object[$zendeskField]) : null;
+                    if ($zendeskTicket === null || $zendeskTicket === '') {
+                        $zendeskTicketId = null;
+                    } else {
+                        if (strrpos($zendeskTicket, '/')) {
+                            $zendeskTicketId = substr($zendeskTicket, strrpos($zendeskTicket, '/') + 1);
+                        } else {
+                            $zendeskTicketId = $zendeskTicket;
+                        }
+                    }
+                    $artifactsToUpdate[] = array(
+                        'type' => $type,
+                        'zendeskTicketId' => $zendeskTicketId, 
+                        'code' => $object['FormattedID'],
+                        'name' => $object['Name'],
+                        'release' => array(
+                            'code' => $release->getCode(),
+                            'date' => $release->getDate()->format('Y-m-d')
+                        )
+                    );
+                }
+            } else {
+                $payload = array(
+                    "defect" => array(
+//                        "c_scrumfield"  => "Released",
+//                        "ScheduleState" => "Released",
+                        "ScheduleState" => "Accepted",
+                    )
+                );
+                $response = json_decode($rally->update($id, $payload, 'hierarchicalrequirement'), true);
+                if(array_key_exists('Object', $response['OperationResult'])) {
+                    $object = $response['OperationResult']['Object'];
+                    $zendeskTicket = array_key_exists($zendeskField, $object) ? trim($object[$zendeskField]) : null;
+                    if ($zendeskTicket === null || $zendeskTicket === '') {
+                        $zendeskTicketId = null;
+                    } else {
+                        if (strrpos($zendeskTicket, '/')) {
+                            $zendeskTicketId = substr($zendeskTicket, strrpos($zendeskTicket, '/') + 1);
+                        } else {
+                            $zendeskTicketId = $zendeskTicket;
+                        }
+                    }
+                    $artifactsToUpdate[] = array(
+                        'type' => $type,
+                        'zendeskTicketId' => $zendeskTicketId,
+                        'code' => $object['FormattedID'],
+                        'name' => $object['Name'],
+                        'release' => array(
+                            'code' => $release->getCode(),
+                            'date' => $release->getDate()->format('Y-m-d')
+                        )
+                    );
+                }
+            }
+            
+        }
+//        ini_set('xdebug.var_display_max_depth', -1);
+//            ini_set('xdebug.var_display_max_children', -1);
+//            ini_set('xdebug.var_display_max_data', -1);
+//        var_dump($asd);
+//        exit();
+        
+        return new JsonResponse($artifactsToUpdate);
+    }
+    
+    /**
     * @Route("/updateStateArtifacts", name="ApiRallyUpdateStateArtifacts")
     * @Method({"GET"})
     */
@@ -223,7 +319,7 @@ class ApiRallyController extends Controller
 
         $jsonDefects = $rally->execute(
                 'defect', 
-                '(Release.ObjectUUID = "b35810bb-0299-4d89-bed5-a5114691d71c")', 
+                '(Release.ObjectUUID = "ffa3460d-a94c-4581-b306-4d737b8956e6")', 
                 'FormattedID ASC', 
                 'ObjectID,FormattedID'
         );
@@ -236,7 +332,7 @@ class ApiRallyController extends Controller
         
         $arrayDefects = json_decode($jsonDefects, true);
         $arrayStories = json_decode($jsonStories, true);
-        var_dump($arrayStories['QueryResult']['Results']);
+        var_dump($arrayDefects['QueryResult']['Results']);
         exit();
         
         foreach($arrayDefects['QueryResult']['Results'] as $defect) {

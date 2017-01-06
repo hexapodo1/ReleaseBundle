@@ -1,0 +1,149 @@
+{% extends 'ReleaseBundle:Default:base.html.twig' %}
+{% block content %}
+    <div id="artifacts_section">
+        <table id="artifacts_tbl" class="table table-responsive table-hover table-bordered">
+
+        </table>
+        <button id="btn-update" class="btn btn-primary">Update states in RallyDev</button>
+        <br><br>
+    </div>
+    <div id="to_zendesk_section" style="display: none">
+        <table id="zendesk_tbl" class="table table-responsive table-hover table-bordered">
+
+        </table>
+        <button id="btn-send" class="btn btn-primary">Send comments to Zendesk</button>
+        <br><br>
+    </div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#btn-update').click(function(e) {
+            e.preventDefault();
+            var artifacts = new Array; 
+            $('input:checked').each(function(i, item){
+                artifacts.push(item.value);
+            });
+            //console.log(artifacts);
+            var nArtifacts=1;
+            $.ajax({
+                url: "{{ path('ApiRallyCloseArtifacts') }}",
+                method: "POST",
+                dataType: "json",
+                data: { 
+                    artifacts: artifacts
+                },
+                success: function (data) {
+                    $('#artifacts_section').hide();
+                    $('#to_zendesk_section').show();
+                    $(data).each(function(i, item){
+                        
+                        var content = '';
+                        var check = $('<td>').html('');
+                        if (item.zendeskTicketId !== null) {
+                            var code = item.release.code;
+                            var date = item.release.date;
+                            content = $('<textarea>')
+                                        .attr('cols', 90)
+                                        .attr('rows', 4)
+                                        .html('This was fixed and released to production as part of ' 
+                                        + code + ', on ' + date + '.');
+                            check = $('<td>').html($('<input>')
+                                        .attr('type','checkbox')
+                                        .attr('checked', true)
+                                        .val(item.code + ':' + item.id )
+                                    );
+                        }
+                        $('#zendesk_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html(nArtifacts++)
+                            )
+                            .append(
+                                check
+                            ).append(
+                                $('<td>').html(item.code)
+                            ).append(
+                                $('<td>').html(item.name)
+                            ).append(
+                                $('<td>').html(content)
+                            ) 
+                        );
+                    });
+                    //$(location).attr('href', '{{ path('home') }}'); 
+                }
+            });
+        });
+        $('body').on('click', '#btn-update', function (){
+            
+
+            
+        });
+        /*$('body').on('click', '.project_lnk', function (){
+            $('#projects_section').hide();
+            var projectID = $(this).data('project-id');
+            var projectUUID = $(this).data('project-uuid');
+
+            $.ajax({
+                url: "{{ path('ApiRallyReleases') }}",
+                method: "GET",
+                dataType: "json",
+                data: {projectId: projectUUID},
+                success: function (data) {
+                    $('#releases_section').show();
+                    $(data.QueryResult.Results).each(function(i, item){
+                        var releaseDate = new Date(item.ReleaseDate);
+                        $('#releases_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html(releaseDate.toLocaleDateString())
+                            ).append(
+                                $('<td>').html($('<a>')
+                                    .addClass('release_lnk')
+                                    .attr('data-release-id', item.ObjectUUID)
+                                    .attr('href', '#')
+                                    .html(item.Name)
+                                )
+                            )    
+                        );
+                    });
+                }
+            });
+        });
+        
+         */
+        var nArtifacts=1;
+        $.ajax({
+            url: "{{ path('artifactsByActiveRelease') }}",
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                $(data).each(function(i, item){
+                    $('#artifacts_tbl').append(
+                        $('<tr>')
+                        .append(
+                            $('<td>').html(nArtifacts++)
+                        )
+                        .append(
+                            $('<td>').html($('<input>')
+                                .attr('type','checkbox')
+                                .attr('checked', true)
+                                .val(item.code + ':' + item.id )
+                            )
+                        ).append(
+                            $('<td>').html(item.code)
+                        ).append(
+                            $('<td>').html(item.name)
+                        ).append(
+                            $('<td>').html(item.owner)
+                        ) 
+                    );
+                });
+            }
+        });
+        /**/
+        
+    });
+</script>
+{% endblock %}

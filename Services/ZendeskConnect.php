@@ -32,23 +32,49 @@ class ZendeskConnect {
         curl_setopt($this->curl, CURLOPT_USERPWD, $this->username . ":" . $this->password);
     }
 
-    public function update($id, $params, $type) {
+    public function updateTicket($id, $params, $type) {
+        $this->_prepare('PUT');
+        $payload = json_encode($params);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $payload);
+        $url = $this->baseUrl . $type . '/' . $id . '.json';
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        return $result = curl_exec($this->curl);
+    }
         
+    public function audit($id) {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json'
         ));
-        $payload = json_encode($params);
+        $this->_prepare('GET');
+        $url = $this->baseUrl . 'tickets/' . $id . '/audits.json';
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        return $result = curl_exec($this->curl);
+    }
+    
+    public function showComments($id) {
         
-        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-        curl_setopt($this->curl, CURLOPT_POST, true);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $payload);
-        $url = $this->baseUrl . $type . '/' . $id . '.json';
+        $this->_prepare('GET');
+        $url = $this->baseUrl . 'tickets/' . $id . '/comments.json';
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        return $result = curl_exec($this->curl);
+    }
+    
+    public function showUsers($ids) {
+        $this->_prepare('GET');
+        $url = $this->baseUrl . 'users/show_many.json?ids={' . $ids . '}';
         curl_setopt($this->curl, CURLOPT_URL, $url);
         return $result = curl_exec($this->curl);
     }
     
     public function close() {
         curl_close($this->curl);
+    }
+    
+    private function _prepare($method) {
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json'
+        ));        
+        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $method);
     }
 
 }
