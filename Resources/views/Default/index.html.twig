@@ -1,6 +1,15 @@
 {% extends 'ReleaseBundle:Default:base.html.twig' %}
 {% block content %}
 {% set userId = app.user.id %}
+{% if changePass %}
+    <div id="modal-user" title="Action required" style="display: none;">
+        <br>
+        <h3>
+            Please change your password in order to get a secure profile.
+        </h3>
+        <br><br>
+    </div>
+{% endif %}
 <div id="modal" title="Summary" style="display: none;">
     <div id="modal-content"></div>
     <br>
@@ -8,7 +17,7 @@
         Publish
     </button>
 </div>
-<div id="tabs">
+<div id="tabs" style="display: none;">
     <ul>
         {% for dataCenter in dataCenters %}
         <li><a href="#tabs-{{ dataCenter.id }}">{{ dataCenter.name }}</a></li>
@@ -83,6 +92,12 @@
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function(){
+        {% if changePass %}
+            $('#modal-user').dialog({
+                modal: true,
+            });
+        {% endif %}
+        $('#tabs').show();
         var modal;
         $('#btn-summary').click(function(e) {
             e.preventDefault();

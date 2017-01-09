@@ -48,6 +48,12 @@ class User implements UserInterface, \Serializable
     protected $salt;
     
     /**
+     * @var boolean
+     * @ORM\Column(name="change_pass", type="boolean")
+     */
+    private $changePass;
+    
+    /**
      * @ORM\OneToMany(targetEntity="Revision", mappedBy="user")
      */
     private $revisions;
@@ -270,4 +276,28 @@ class User implements UserInterface, \Serializable
         return $this->usersReleases;
     }
     
+
+    /**
+     * Set changePass
+     *
+     * @param boolean $changePass
+     *
+     * @return User
+     */
+    public function setChangePass($changePass)
+    {
+        $this->changePass = $changePass;
+
+        return $this;
+    }
+
+    /**
+     * Get changePass
+     *
+     * @return boolean
+     */
+    public function getChangePass()
+    {
+        return $this->changePass;
+    }
 }
