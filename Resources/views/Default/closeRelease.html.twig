@@ -15,7 +15,7 @@
         <br><br>
     </div>
     <div id="continue_section" style="display: none">
-        <h2>Success</h2>
+        <h2></h2>
         <button id="btn-continue" class="btn btn-primary">Continue...</button>
         <br><br>
     </div>
@@ -29,7 +29,6 @@
             $('input:checked').each(function(i, item){
                 artifacts.push(item.value);
             });
-            //console.log(artifacts);
             var nArtifacts=1;
             $.ajax({
                 url: "{{ path('ApiRallyCloseArtifacts') }}",
@@ -42,13 +41,13 @@
                     $('#artifacts_section').hide();
                     $('#to_zendesk_section').show();
                     $(data).each(function(i, item){
-                        
                         var content = '';
                         var check = $('<td>').html('');
                         if (item.zendeskTicketId !== null) {
                             var code = item.release.code;
                             var date = item.release.date;
                             content = $('<textarea>')
+                                        .addClass('to-send')
                                         .attr('cols', 80)
                                         .attr('rows', 4)
                                         .attr('data-ticketId', item.zendeskTicketId)
@@ -57,7 +56,7 @@
                             check = $('<td>').html($('<input>')
                                         .attr('type','checkbox')
                                         .attr('checked', true)
-                                        .val(item.code + ':' + item.id )
+                                        .addClass('chk_artifact')
                                     );
                         }
                         $('#zendesk_tbl').append(
@@ -82,19 +81,24 @@
         $('body').on('click', '#btn-continue', function (e){
             e.preventDefault();
             $(location).attr('href', '{{ path('home') }}');
-        })
-        
+        });
+        $('body').on('change', '.chk_artifact', function(){
+            if ($(this).is(':checked')) {
+                $(this).parent().parent().find('textarea').addClass('to-send');
+            } else {
+                $(this).parent().parent().find('textarea').removeClass('to-send');
+            }
+        });
         $('body').on('click', '#btn-send', function (e){
             e.preventDefault();
             var tickets = new Array();
-            $('textarea').each(function (i, item) {
+            $('.to-send').each(function (i, item) {
                 var ticket = {
                     id: $(item).data('ticketid'),
                     message: $(item).val()
                 };
                 tickets.push(ticket);
             });
-            //console.log(tickets);
             $.ajax({
                 url: "{{ path('ApiZendeskUpdateTickets') }}",
                 method: "POST",
@@ -103,19 +107,22 @@
                     tickets: tickets
                 },
                 success: function (data) {
+                    if (data.success) {
+                        $('#continue_section h2').html('Success');
+                    } else {
+                        $('#continue_section h2').html('Error, try again.');
+                    }
                     $('#to_zendesk_section').hide();
                     $('#continue_section').show();
                 }
             });
         });
-        
         var nArtifacts=1;
         $.ajax({
             url: "{{ path('artifactsByActiveRelease') }}",
             method: "GET",
             dataType: "json",
             success: function (data) {
-                console.log(data);
                 $(data).each(function(i, item){
                     $('#artifacts_tbl').append(
                         $('<tr>')
@@ -138,9 +145,7 @@
                     );
                 });
             }
-        });
-        /**/
-        
+        });        
     });
 </script>
 {% endblock %}

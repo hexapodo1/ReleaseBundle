@@ -16,95 +16,37 @@ use Kishron\ReleaseBundle\Entity\Story;
  */
 class ApiZendeskController extends Controller
 {
-    
-    
+
     /**
     * @Route("/updateTickets", name="ApiZendeskUpdateTickets")
     * @Method({"POST"})
     */
     public function updateTicketsAction(Request $request) {
-        $tickets = $request->request->get('tickets');
+        $tickets = $request->request->get('tickets', array());
         $zendesk = $this->get('zendesk');
-        foreach ($tickets as $ticket) {
-            $payload = array(
-                "ticket" => array(
-                    "comment" => array(
-                        "html_body" => $ticket['message'],
-                        "public" => false
+        try {
+            foreach ($tickets as $ticket) {
+                $payload = array(
+                    "ticket" => array(
+                        "comment" => array(
+                            "html_body" => $ticket['message'],
+                            "public" => false
+                        )
                     )
-                )
-            );
-            if (9523!=$ticket['id'] )
+                );
                 $responseJson = $zendesk->updateTicket($ticket['id'], $payload, 'tickets');
+            }
+            $response = array(
+                'success' => true
+            );
+        } catch (Exception $e) {
+            $response = array(
+                'success' => false,
+                'error' => $e->getMessage()
+            );
         }
-        $response = array(
-          'success' => true
-        );
+        
         return new JsonResponse($response);
     }
     
-    /**
-    * @Route("/updateTicketBk", name="ApiZendeskUpdateTicketBk")
-    * @Method({"GET"})
-    */
-    public function _updateTicketAction(Request $request) {
-        $zendeskConfig = $this->container->getParameter('zendesk');
-        if ($zendeskConfig['debug']) {
-            ini_set('xdebug.var_display_max_depth', -1);
-            ini_set('xdebug.var_display_max_children', -1);
-            ini_set('xdebug.var_display_max_data', -1);
-        }
-        $zendesk = $this->get('zendesk');
-
-        
-        $payload = array(
-            "ticket" => array(
-//                    "status" => "pending",
-//                    "priority" => 'low',
-                "comment" => array(
-                    "html_body" => "thanks 123",
-                    "author_id" => 16802009308,
-                    "public" => false
-                )
-            )
-        );
-        //$responseJson = $zendesk->updateTicket(1, $payload, 'tickets');
-        //$responseJson = $zendesk->audit(1);
-        $responseJson = $zendesk->showComments(2);
-        $response = json_decode($responseJson, true);
-        $authors = array(null); // dummy null
-        $return = array();
-        foreach ($response['comments'] as $r) {
-            $return[] = array(
-                'created_at' => $r['created_at'],
-                'body'       => $r['body'],
-                'author_id'  => $r['author_id']
-            );
-            $authors[] = $r['author_id'];
-        }
-        $authors = array_unique($authors);
-        $strAuthors = implode(',', $authors);
-        $responseJson = $zendesk->showUsers($strAuthors);
-        $response = json_decode($responseJson, true);
-        $users = array();
-        if (array_key_exists('users', $response)) {
-            foreach ($response['users'] as $user) {
-                $users[] = array(
-                    'id'   => $user['id'],
-                    'name' => $user['name']
-                );
-            }
-        } 
-        array_walk($return, function(&$element) use ($users){
-            foreach ($users as $user) {
-                if (false !== array_search($element['author_id'], $user)) {
-                    $element['author_name'] = $user['name'];
-                    //break;
-                }
-            }
-        });
-        //  var_dump($return);exit();
-        return new JsonResponse($return);
-    }
-
 }
