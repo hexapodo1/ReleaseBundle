@@ -258,7 +258,10 @@ class DefaultController extends Controller
      */
     public function EditProfileAction()
     {
-        return $this->render('ReleaseBundle:Default:editProfile.html.twig', array()); 
+        $userLoggued = $this->getUser();
+        return $this->render('ReleaseBundle:Default:editProfile.html.twig', array(
+            'login' => $userLoggued->getName()
+        )); 
     }
     
     /**
@@ -274,7 +277,7 @@ class DefaultController extends Controller
             $em = $this->getDoctrine()->getManager();
             $userRepo = $em->getRepository('ReleaseBundle:User');
             $userToUpdate = $userRepo->find($userLoggued->getId());
-            if ($login !== '') {
+            if ($login !== '' && $login !== $userLoggued->getName()) {
                 $userToUpdate->setName($login); 
                 $updated = true;
             }
