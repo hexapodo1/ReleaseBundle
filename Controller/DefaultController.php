@@ -16,7 +16,7 @@ class DefaultController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-        
+        $user = $this->getUser();
         // repos
         $storyRepo = $em->getRepository("ReleaseBundle:Story");
         $releaseRepo = $em->getRepository("ReleaseBundle:ReleaseObj");
@@ -37,7 +37,8 @@ class DefaultController extends Controller
         return $this->render('ReleaseBundle:Default:index.html.twig', array(
             'release' => $release,
             'stories' => $stories,
-            'dataCenters' => $dataCenters
+            'dataCenters' => $dataCenters,
+            'changePass' => $user->getChangePass()
         ));
     }
     
@@ -278,6 +279,7 @@ class DefaultController extends Controller
                 $updated = true;
             }
             if ($pass !== '') {
+                $userToUpdate->setChangePass(false);
                 $userToUpdate->setSalt(md5(time()));
                 $encoder = $this->container->get('security.encoder_factory')->getEncoder($userToUpdate);
                 $passwordCodificado = $encoder->encodePassword($pass, $userToUpdate->getSalt());
