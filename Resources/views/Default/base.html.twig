@@ -86,7 +86,7 @@
                                 <li><a href="{{ path('loadRelease') }}">Setup</a></li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
-                                <li><p>{% if app.user %}{{ app.user.name }}{% endif %} (<a href="logout">Log Out</a>)</p></li>
+                                <li><p>{% if app.user %}<a href="{{ path('editProfile') }}">{{ app.user.name }}</a>{% endif %} (<a href="logout">Log Out</a>)</p></li>
                             </ul>
                         </div>
                     </div>

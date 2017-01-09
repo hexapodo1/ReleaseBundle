@@ -1,0 +1,156 @@
+{% extends 'ReleaseBundle:Default:base.html.twig' %}
+{% block content %}
+    <div id="profile_section" class="col-xs-6 col-xs-offset-2">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="txt_login" class="col-xs-3 control-label">Email</label>
+                <div class="col-xs-9">
+                    <input type="text" autocomplete="off" class="form-control" id="txt_login" placeholder="Login, it's recommended same as Hipchat.">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="txt_pass1" class="col-xs-3 control-label">Password</label>
+                <div class="col-xs-9">
+                    <input type="password" class="form-control" id="txt_pass1" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="txt_pass2" class="col-xs-3 control-label">Repeat Password</label>
+                <div class="col-xs-9">
+                    <input type="password" class="form-control" id="txt_pass2" placeholder="Repeat your password">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-offset-3 col-xs-9">
+                    <div class="checkbox_">
+                        <label>
+                            Note: keep blank any field to ignore it. 
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button id="btn-update" class="btn btn-primary">Update Your Profile</button>
+                </div>
+            </div>
+            
+            <div class="form-group" style="display: none;" id='msg-pass'>
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="alert alert-danger" role="alert">
+                        The password fields must be equals.
+                    </div>
+                </div>
+            </div>
+          </form>
+        <br><br>
+    </div>
+    <div id="continue_section" style="display: none">
+        <h2></h2>
+        <button id="btn-continue" class="btn btn-primary">Continue...</button>
+        <br><br>
+    </div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#btn-update').click(function(e) {
+            e.preventDefault();
+            $('#msg-pass').hide();
+            // validate pass (only same both fields)
+            if ($('#txt_pass1').val().trim() !== '' && $('#txt_pass1').val().trim() !== $('#txt_pass2').val().trim()) {
+                $('#msg-pass').show();
+            } else {
+                $.ajax({
+                    url: "{{ path('updateProfile') }}",
+                    method: "POST",
+                    dataType: "json",
+                    data: { 
+                        login: $('#txt_login').val().trim(),
+                        pass: $('#txt_pass1').val().trim()
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data.success) {
+                            if (data.updated) {
+                                $(location).attr('href', '{{ path('logout') }}');
+                            } else {
+                                $(location).attr('href', '{{ path('home') }}');
+                            }
+                        }
+                    }
+                });
+            }
+            
+        });
+        $('body').on('click', '#btn-continue', function (e){
+            e.preventDefault();
+            $(location).attr('href', '{{ path('home') }}');
+        });
+        $('body').on('change', '.chk_artifact', function(){
+            if ($(this).is(':checked')) {
+                $(this).parent().parent().find('textarea').addClass('to-send');
+            } else {
+                $(this).parent().parent().find('textarea').removeClass('to-send');
+            }
+        });
+        $('body').on('click', '#btn-send', function (e){
+            e.preventDefault();
+            var tickets = new Array();
+            $('.to-send').each(function (i, item) {
+                var ticket = {
+                    id: $(item).data('ticketid'),
+                    message: $(item).val()
+                };
+                tickets.push(ticket);
+            });
+            $.ajax({
+                url: "{{ path('ApiZendeskUpdateTickets') }}",
+                method: "POST",
+                dataType: "json",
+                data: {
+                    tickets: tickets
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $('#continue_section h2').html('Success');
+                    } else {
+                        $('#continue_section h2').html('Error, try again.');
+                    }
+                    $('#to_zendesk_section').hide();
+                    $('#continue_section').show();
+                }
+            });
+        });
+        var nArtifacts=1;
+        $.ajax({
+            url: "{{ path('artifactsByActiveRelease') }}",
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                $(data).each(function(i, item){
+                    $('#artifacts_tbl').append(
+                        $('<tr>')
+                        .append(
+                            $('<td>').html(nArtifacts++)
+                        )
+                        .append(
+                            $('<td>').html($('<input>')
+                                .attr('type','checkbox')
+                                .attr('checked', true)
+                                .val(item.code + ':' + item.id )
+                            )
+                        ).append(
+                            $('<td>').html(item.code)
+                        ).append(
+                            $('<td>').html(item.name)
+                        ).append(
+                            $('<td>').html(item.owner)
+                        ) 
+                    );
+                });
+            }
+        });        
+    });
+</script>
+{% endblock %}

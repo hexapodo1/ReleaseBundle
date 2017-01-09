@@ -252,5 +252,55 @@ class DefaultController extends Controller
         return new JsonResponse($artefacts);
     }
     
+    /**
+     * @Route("/editProfile", name="editProfile")
+     */
+    public function EditProfileAction()
+    {
+        return $this->render('ReleaseBundle:Default:editProfile.html.twig', array()); 
+    }
+    
+    /**
+     * @Route("/updateProfile", name="updateProfile")
+     */
+    public function updateProfileAction(Request $request)
+    {
+        try {
+            $updated = false;
+            $login = $request->request->get('login');
+            $pass = $request->request->get('pass');
+            $userLoggued = $this->getUser();
+            $em = $this->getDoctrine()->getManager();
+            $userRepo = $em->getRepository('ReleaseBundle:User');
+            $userToUpdate = $userRepo->find($userLoggued->getId());
+            if ($login !== '') {
+                $userToUpdate->setName($login); 
+                $updated = true;
+            }
+            if ($pass !== '') {
+                $userToUpdate->setSalt(md5(time()));
+                $encoder = $this->container->get('security.encoder_factory')->getEncoder($userToUpdate);
+                $passwordCodificado = $encoder->encodePassword($pass, $userToUpdate->getSalt());
+                $userToUpdate->setPassword($passwordCodificado);   
+                $updated = true;
+            }
+            if ($updated) {
+                $em->persist($userToUpdate);
+                $em->flush();
+            }
+            $response = array(
+                'success' => true,
+                'updated' => $updated
+            );
+        } catch (\Exception $e) {
+            $response = array(
+                'success' => false,
+                'error' => $e->getMessage()
+            );
+        }
+        
+        return new JsonResponse($response);
+    }
+    
     
 }
