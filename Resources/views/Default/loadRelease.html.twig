@@ -55,6 +55,27 @@
                 data: { releaseId: releaseId },
                 success: function (data) {
                     $('#artifacts_section').show();
+                    $(data.TestSets).each(function(i, item){
+                        $('#artifacts_tbl').append(
+                            $('<tr>')
+                            .append(
+                                $('<td>').html(nArtifacts++)
+                            )
+                            .append(
+                                $('<td>').html($('<input>')
+                                    .attr('type','checkbox')
+                                    .attr('checked', true)
+                                    .val(item.FormattedID)
+                                )
+                            ).append(
+                                $('<td>').html(item.FormattedID)
+                            ).append(
+                                $('<td>').html(item._refObjectName)
+                            ).append(
+                                $('<td>').html(item.Owner._refObjectName)
+                            )
+                        );
+                    });
                     $(data.Defects).each(function(i, item){
                         $('#artifacts_tbl').append(
                             $('<tr>')

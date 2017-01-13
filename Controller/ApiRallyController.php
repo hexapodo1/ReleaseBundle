@@ -85,14 +85,24 @@ class ApiRallyController extends Controller
                 'FormattedID ASC', 
                 'ObjectUUID,FormattedID,Owner'
         );
+        $jsonTestSets = $rally->execute(
+                'testset', 
+                '(Release.ObjectUUID = "' . $releaseId . '")', 
+                'FormattedID ASC', 
+                'ObjectUUID,FormattedID,Owner'
+        );
+        
         $arrayDefects = json_decode($jsonDefects, true);
         $arrayStories = json_decode($jsonStories, true);
+        $arrayTestSets = json_decode($jsonTestSets, true);
 
         $rally->close();
         $json = '{"Defects": '
                 . json_encode($arrayDefects['QueryResult']['Results'])
                 . ', "Stories": '
                 . json_encode($arrayStories['QueryResult']['Results'])
+                . ', "TestSets": '
+                . json_encode($arrayTestSets['QueryResult']['Results'])
                 . '}';
         return new JsonResponse(json_decode($json));
     }
@@ -124,6 +134,7 @@ class ApiRallyController extends Controller
                 'FormattedID ASC', 
                 'ObjectID,ObjectUUID,FormattedID,TestCases,Owner'
         );
+        
         $jsonStories = $rally->execute(
                 'hierarchicalrequirement', 
                 '(Release.ObjectUUID = "' . $releaseId . '")', 
@@ -131,6 +142,14 @@ class ApiRallyController extends Controller
                 'ObjectID,ObjectUUID,FormattedID,TestCases,Owner'
         );
         
+        $jsonTestSets = $rally->execute(
+                'testset', 
+                '(Release.ObjectUUID = "' . $releaseId . '")', 
+                'FormattedID ASC', 
+                'ObjectID,ObjectUUID,FormattedID,TestCases,Owner'
+        );
+
+        $arrayTestSets = json_decode($jsonTestSets, true);
         $arrayDefects = json_decode($jsonDefects, true);
         $arrayStories = json_decode($jsonStories, true);
         $arrayRelease = json_decode($jsonRelease, true);
@@ -157,7 +176,26 @@ class ApiRallyController extends Controller
             $release->setProject($project);
             $em->persist($release);
         }
-        
+        foreach ($arrayTestSets['QueryResult']['Results'] as $result) {
+            if (in_array($result['FormattedID'], $artifacts) ) {
+                $story = $storyRepo->findOneBy(array(
+                    'objectUUID' => $result['ObjectUUID']
+                ));
+                if (!$story) {
+                    $story = new Story();
+                    $story->setCode($result['FormattedID']);
+                    $story->setName($result['_refObjectName']);
+                    $story->setObjectID($result['ObjectID']);
+                    $story->setObjectUUID($result['ObjectUUID']);
+                    $story->setOwner($result['Owner']['_refObjectName']);                    
+                    $url = "https://rally1.rallydev.com/#/" . $projectID . "d/detail/testset/"
+                        .$result['ObjectID'] . "/run" ;
+                    $story->setRallyUrl($url);
+                    $story->setRelease($release);
+                    $em->persist($story);
+                }
+            }
+        }
         foreach ($arrayDefects['QueryResult']['Results'] as $result) {
             if (in_array($result['FormattedID'], $artifacts) ) {
                 $story = $storyRepo->findOneBy(array(
@@ -265,7 +303,7 @@ class ApiRallyController extends Controller
                         )
                     );
                 }
-            } else {
+            } elseif ($type === 'US') {
                 $payload = array(
                     "defect" => array(
                         "c_scrumfield"  => "Released",
@@ -297,8 +335,28 @@ class ApiRallyController extends Controller
                         )
                     );
                 }
+            } else {
+              $payload = array(
+                  "defect" => array(
+                      "ScheduleState" => "Released",
+                  )
+              );
+              $response = json_decode($rally->update($id, $payload, 'testset'), true);
+              if(array_key_exists('Object', $response['OperationResult'])) {
+                  $object = $response['OperationResult']['Object'];
+                  $zendeskTicketId = null;
+                  $artifactsToUpdate[] = array(
+                      'type' => $type,
+                      'zendeskTicketId' => $zendeskTicketId,
+                      'code' => $object['FormattedID'],
+                      'name' => $object['Name'],
+                      'release' => array(
+                          'code' => $release->getCode(),
+                          'date' => $release->getDate()->format('Y-m-d')
+                      )
+                  );
+              }
             }
-            
         }
 //        ini_set('xdebug.var_display_max_depth', -1);
 //            ini_set('xdebug.var_display_max_children', -1);
@@ -308,61 +366,7 @@ class ApiRallyController extends Controller
         
         return new JsonResponse($artifactsToUpdate);
     }
-    
-    /**
-    * @Route("/updateStateArtifacts", name="ApiRallyUpdateStateArtifacts")
-    * @Method({"GET"})
-    */
-    public function updateStateArtifactsAction(Request $request) {
-        
-        $rally = $this->get('rally');
 
-        $jsonDefects = $rally->execute(
-                'defect', 
-                '(Release.ObjectUUID = "ffa3460d-a94c-4581-b306-4d737b8956e6")', 
-                'FormattedID ASC', 
-                'ObjectID,FormattedID'
-        );
-        $jsonStories = $rally->execute(
-                'hierarchicalrequirement', 
-                '(Release.ObjectUUID = "b35810bb-0299-4d89-bed5-a5114691d71c")', 
-                'FormattedID ASC', 
-                'ObjectID,FormattedID'
-        );
-        
-        $arrayDefects = json_decode($jsonDefects, true);
-        $arrayStories = json_decode($jsonStories, true);
-        var_dump($arrayDefects['QueryResult']['Results']);
-        exit();
-        
-        foreach($arrayDefects['QueryResult']['Results'] as $defect) {
-            $id = $defect['ObjectID'];
-            $payload = array(
-                "defect" => array(
-                    "c_scrumfield"  => "Released",
-                    "ScheduleState" => "Released",
-                    "State"         => "Closed"
-                )
-            );
-            $asd = $rally->update($id, $payload, 'defect');
-            //var_dump($defect['FormattedID']);
-        }
-        foreach($arrayStories['QueryResult']['Results'] as $defect) {
-            $id = $defect['ObjectID'];
-            $payload = array(
-                "hierarchicalrequirement" => array(
-                    "c_scrumfield"  => "Released",
-                    "ScheduleState" => "Released"
-                )
-            );
-            $asd = $rally->update($id, $payload, 'hierarchicalrequirement');
-            //var_dump($defect['FormattedID']);
-        }
-        exit();
-        
-        return new JsonResponse($json);
-    }
-    
     /**
      * @Route("/projects", name="ApiRallyProjects")
      * @Method({"GET"})
