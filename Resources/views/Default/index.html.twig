@@ -4,9 +4,9 @@
 {% if changePass %}
     <div id="modal-user" title="Action required" style="display: none;">
         <br>
-        <h3>
-            Please change your password in order to get a secure profile.
-        </h3>
+        <p>
+            Please change your password <a href="{{ path('editProfile') }}" class="link">here</a> in order to get a secure profile.
+        </p>
         <br><br>
     </div>
 {% endif %}
