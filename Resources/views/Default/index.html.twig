@@ -161,7 +161,9 @@
                         for (var propt2 in obj) {
                             // using jquery selectors causes error (a jquery bug)
                             var span = document.getElementById('review_' + propt + '_' + propt2);
-                            span.innerHTML = data[propt][propt2];
+                            if (span !== null) {
+                                span.innerHTML = data[propt][propt2];
+                            }
                         }
                     }
                 }
